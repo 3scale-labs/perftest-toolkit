@@ -1,0 +1,10 @@
+---
+# defaults file for upstream-configurator
+
+upstream_apicast_registry_name: "quay.io"
+upstream_apicast_image_tag: "3.2-stable"
+upstream_apicast_repository_name: "3scale/apicast"
+upstream_apicast_image: "{{ upstream_apicast_registry_name }}/{{ upstream_apicast_repository_name }}:{{ upstream_apicast_image_tag }}"
+upstream_apicast_workers: 4
+upstream_apicast_config_file_origin: "etc/apicast_config.json"
+upstream_apicast_config_file_destination: "/etc/apicast_config.json"

@@ -1,0 +1,5 @@
+---
+- hosts: buddhi
+  become: yes
+  roles:
+    - buddhi-configurator 

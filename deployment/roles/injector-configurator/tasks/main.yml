@@ -1,0 +1,5 @@
+---
+# tasks file for injector-configurator
+
+- include: build-image.yml
+- include: configure-injector.yml
