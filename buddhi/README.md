@@ -1,6 +1,6 @@
 # Buddhi - 3Scale AMP service setup and traffic generation tool
 
-Responsabilitites:
+Responsibilities:
 
 * 3Scale AMP db provisioning using 3scale backend internal api
 * Provide services configuration for APIcast gateway
@@ -39,9 +39,20 @@ $ curl http://127.0.0.1:8089/paths/amp?lines=1
 "30dd63c1-4ee9-481e-b0ed-e7d10d4900c9","/1?user_key=2c6e8625ed43d064"
 ```
 
-## Build
+## Contributing
+
+## Run unit tests
 
 ```shell
+make clean
+make test-install
+make test
+```
+
+## Build docker image
+
+```shell
+make clean
 make build'
 ```
 
