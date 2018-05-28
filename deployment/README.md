@@ -164,9 +164,32 @@ Some configuration parameters (in deployment config) that were applied during te
 CPU resource limits: request: 1  limit: 2
 ```
 
-### Wildcard route for test traffic
+### Wildcard route
+* Enable wildcard routes support
+  * Go to Openshift dashboard, go to *Default* project.
+  * Go to *Applications* -> *Deployments*. Select *router*
+  * Go to *Environment* tab, check the following wildcard configuration is set.
+```
+ROUTER_ALLOW_WILDCARD_ROUTES = true
+```
 
-**TODO**
+Wait few seconds until routers have restarted.
+
+* Create wildcard route
+  * Go to AMP project.
+  * Go to *Applications* -> *Routes*
+  * Push on *Create Route* button.
+  * Fill the following settings:
+
+```
+Name: <any meaninful name>
+Hostname: *.benchmark.<OCP_domain>
+Path: /
+Service: apicast-production
+Target-Port: 8080 -> 8080
+Check *Secure Route* when *https* is used
+```
+  * Push on *Create* button.
 
 ## Deploy & Run Test Configurator
 
@@ -243,7 +266,7 @@ Domain that resolves to your OCP cluster
 
 ```
 File: roles/buddhi-configurator/defaults/main.yml
-buddhi_wilcard_domain: <wilcard_domain>
+buddhi_wilcard_domain: benchmark.<OCP_domain>
 ```
 
 * Execute the playbook that installs and configures via Ansible
