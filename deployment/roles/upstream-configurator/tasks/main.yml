@@ -1,0 +1,21 @@
+---
+  - name: Set apicast configuration file
+    copy:
+      src: "{{ upstream_apicast_config_file_origin }}"
+      dest: "{{ upstream_apicast_config_file_destination }}"
+    register: copy_result
+
+  - name: Run echo api container
+    docker_container:
+      name: echo-api
+      state: started 
+      tty: yes
+      network_mode: host
+      privileged: yes
+      restart: "{{ copy_result.changed }}"
+      volumes:
+        - "{{ upstream_apicast_config_file_destination }}:{{ upstream_apicast_config_file_destination }}"
+      env:
+        THREESCALE_CONFIG_FILE: "{{ upstream_apicast_config_file_destination }}"
+        APICAST_WORKERS: "{{ upstream_apicast_workers }}"
+      image: "{{ upstream_apicast_image }}"

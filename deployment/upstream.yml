@@ -1,0 +1,5 @@
+---
+- hosts: upstream
+  become: yes
+  roles:
+    - upstream-configurator

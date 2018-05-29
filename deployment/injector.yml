@@ -1,0 +1,5 @@
+---
+- hosts: injector
+  become: yes
+  roles:
+    - injector-configurator
