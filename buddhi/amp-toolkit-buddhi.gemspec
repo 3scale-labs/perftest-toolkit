@@ -21,6 +21,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.5'
   spec.add_development_dependency 'rspec-collection_matchers'
   spec.add_development_dependency 'simplecov'
-  spec.add_dependency 'pisoni', '~> 1.23'
+  spec.add_dependency 'pisoni', '~> 1.23.1'
   spec.add_dependency 'slop', '~> 4.4'
 end
