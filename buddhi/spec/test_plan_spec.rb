@@ -119,7 +119,7 @@ RSpec.describe AMP::Toolkit::Buddhi::TestPlan do
           proxy_rules: [
             {
               http_method: 'GET',
-              pattern: '/m_a_2/',
+              pattern: '/1',
               metric_system_name: 'm_a_2',
               delta: 1
             }
@@ -129,7 +129,7 @@ RSpec.describe AMP::Toolkit::Buddhi::TestPlan do
     end
 
     it 'amp_path should return host and gateway path' do
-      expect(subject.amp_path).to eq('"idA.my_apicast.io","/m_a_2/some-request?user_key=key_a"')
+      expect(subject.amp_path).to eq('"idA.my_apicast.io","/1?user_key=key_a"')
     end
 
     it 'backend_path should return backend path' do
