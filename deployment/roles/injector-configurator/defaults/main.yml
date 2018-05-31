@@ -20,4 +20,4 @@ injector_jmeter_image_tag: "1.0"
 
 injector_jmeter_target_host: "<jmeter_target_host>"
 injector_jmeter_protocol: "http"
-injector_jmeter_target_port: "<jmeter_target_host>"
+injector_jmeter_target_port: "80"
