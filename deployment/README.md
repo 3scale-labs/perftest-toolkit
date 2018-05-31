@@ -40,7 +40,7 @@ ansible 2.3.1.0
 The 3scale performance testing ansible project can be obtained from the following GitHub repository:
 
 ```bash
-$ git clone git@github.com:3scale/perftest-setup.git
+$ git clone git@github.com:3scale/perftest-toolkit.git
 $ cd deployment
 ```
 
@@ -211,11 +211,12 @@ Steps:
 
 * Configure Test Configurator host
 
-Set *ansible_host* attribute of buddhi host in the inventary file *hosts*
+Set *ansible_host* attribute of *buddhi* host
 
 ```
-File: roles/buddhi-configurator/defaults/main.yml
-buddhi ansible_host=mytest_configuratorhost.addr.com ansible_user=centos
+File: hosts
+
+buddhi ansible_host=<buddhi_uri> ansible_user=centos
 ```
 
 * Configure AMP backend uri
@@ -225,6 +226,7 @@ buddhi ansible_host=mytest_configuratorhost.addr.com ansible_user=centos
 
 ```
 File: roles/buddhi-configurator/defaults/main.yml
+
 buddhi_internal_api_uri: "<backend_uri>"
 ```
 
@@ -233,6 +235,7 @@ buddhi_internal_api_uri: "<backend_uri>"
   * Go to *Environment* tab, you will get basic authentication information from  [*CONFIG_INTERNAL_API_USER*, *CONFIG_INTERNAL_API_PASSWORD*] settings.
 ```
 File: roles/buddhi-configurator/defaults/main.yml
+
 buddhi_backend_username: "<backend_username>"
 buddhi_backend_pass: "<backend_basic_auth_pass>"
 ```
@@ -245,6 +248,7 @@ Traffic load in terms of requests per second will be specified when running test
 
 ```
 File: roles/buddhi-configurator/defaults/main.yml
+
 buddhi_traffic_profile: [ simple | onprem | saas ]
 ```
 
@@ -257,6 +261,7 @@ Check available [*echo-api* service deployment section](#deploy-&-setup-upstream
 
 ```
 File: roles/buddhi-configurator/defaults/main.yml
+
 buddhi_upstream_uri: "<your-api-uri>"
 ```
 
@@ -266,6 +271,7 @@ Domain that resolves to your OCP cluster
 
 ```
 File: roles/buddhi-configurator/defaults/main.yml
+
 buddhi_wilcard_domain: benchmark.<OCP_domain>
 ```
 
@@ -301,12 +307,14 @@ Installed packages requirements for the host:
 * Edit the *ansible_host* parameter of the *injector* entry by replacing **<injector_host>** with the host IP address/DNS name of the machine where you want to install the injector component. For example:
 ```
 File: hosts
+
 injector ansible_host=myinjectorhost.addr.com ansible_user=centos
 ```
 
 * Edit the **injector_jmeter_target_host** parameter replacing *<jmeter_target_host>* with the route endpoint of the AMP gateway. For example:
 ```
 File: roles/injector-configurator/defaults/main.yml
+
 Injector_jmeter_target_host: myroutehostname.com
 ```
 
