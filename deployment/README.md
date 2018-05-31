@@ -176,20 +176,47 @@ ROUTER_ALLOW_WILDCARD_ROUTES = true
 Wait few seconds until routers have restarted.
 
 * Create wildcard route
-  * Go to AMP project.
-  * Go to *Applications* -> *Routes*
-  * Push on *Create Route* button.
-  * Fill the following settings:
+
+Currently (OCP 3.7), wildcard routes cannot be created using dashboard. CLI *oc* must be used.
+Initial *CLI* session set up is needed. Check
+[Basic Setup and Login](https://docs.openshift.com/container-platform/3.7/cli_reference/get_started_cli.html#basic-setup-and-login)
+documentation reference for more information.
+
+When *oc* is set up, fill the following template with your **<OCP_DOMAIN>**
 
 ```
-Name: <any meaninful name>
-Hostname: *.benchmark.<OCP_domain>
-Path: /
-Service: apicast-production
-Target-Port: 8080 -> 8080
+apiVersion: v1
+kind: Route
+metadata:
+  name: apicast-wildcard-router-route
+spec:
+  host: subdomain.benchmark.**<OCP_DOMAIN>**
+  to:
+    kind: Service
+    name: apicast-production
+  port:
+    targetPort: gateway
+  wildcardPolicy: Subdomain
+```
+
+Save it on a file. Then, create wildcard route using *oc*:
+
+```
+# oc create -f wildcard-route.yml
+route "apicast-wildcard-router-route" created
+```
+
+When *https* is the desired traffic, this can be enabled using dashboard.
+
+  * Go to AMP project.
+  * Go to *Applications* -> *Routes*
+  * Click on *apicast-wildcard-router-route* route
+  * Go to *Actions* -> *Edit*
+
+```
 Check *Secure Route* when *https* is used
 ```
-  * Push on *Create* button.
+  * Push on *Save* button.
 
 ## Deploy & Run Test Configurator
 
@@ -272,7 +299,7 @@ Domain that resolves to your OCP cluster
 ```
 File: roles/buddhi-configurator/defaults/main.yml
 
-buddhi_wilcard_domain: benchmark.<OCP_domain>
+buddhi_wildcard_domain: benchmark.<OCP_domain>
 ```
 
 * Execute the playbook that installs and configures via Ansible
