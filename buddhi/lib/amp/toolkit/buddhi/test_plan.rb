@@ -3,7 +3,7 @@ module AMP
     module Buddhi
       # TestPlan Interface
       module TestPlan
-        %i[apicast_service_info amp_path backend_path].each do |method_name|
+        %i[amp_uri_path backend_metric_usage].each do |method_name|
           define_method(method_name) do
             raise 'Not Implemented'
           end
@@ -88,6 +88,11 @@ module AMP
           "#{uri.path}?#{uri.query}"
         end
 
+        def apicast_service_info(id)
+          return unless @services.key? id
+          apicast_service_obj @services[id]
+        end
+
         def apicast_service_obj(service)
           {
             id: service[:id],
@@ -104,7 +109,7 @@ module AMP
               proxy_rules: service[:metrics].values.drop(1).each_with_index.map do |metric, idx|
                 {
                   http_method: 'GET',
-                  pattern: yield(metric, idx),
+                  pattern: proxy_pattern(idx + 1),
                   metric_system_name: metric[:name],
                   delta: 1
                 }
@@ -113,8 +118,39 @@ module AMP
           }
         end
 
+        def proxy_pattern(n)
+          format('/%<path>s', path: '1' * n)
+        end
+
+        def amp_path
+          service = @services.values.sample
+          app_key = service[:application_keys].sample
+          app_id_auth = app_auth_params app_key
+          uri = amp_uri(amp_uri_path, app_id_auth)
+          host = hosts_for(service[:id]).first
+          path = "#{uri.path}?#{uri.query}"
+          %("#{host}","#{path}")
+        end
+
         def amp_uri(path, query_params)
           URI::HTTP.build(path: path, query: URI.encode_www_form(query_params))
+        end
+
+        def backend_path
+          service = @services.values.sample
+          app_key = service[:application_keys].sample
+          app_id_auth = app_auth_params app_key
+
+          query = {
+            provider_key: service[:provider_key],
+            service_id: service[:id]
+          }.merge(app_id_auth)
+
+          backend_metric_usage(service) do |metric|
+            query["usage[#{metric[:name]}]".to_sym] = 1
+          end
+
+          backend_uri(query)
         end
       end
     end
