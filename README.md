@@ -7,6 +7,8 @@ By running performance test with the same tools, scripts, traffic patterns and m
 
 The goal is to help to resolve doubts or issues related to scalability or performance more quickly and easily - allowing you to achieve the high levels of low-latency performance we strive for and ensure in our own internal testing. 
 
+![Test setup](/deployment/doc/infrastructure.png "Infrastructure")
+
 ## [Deployment](/deployment) - 3Scale AMP service setup for testing
 
 ## [Buddhi](/buddhi) - 3Scale AMP service setup and traffic generation tool
