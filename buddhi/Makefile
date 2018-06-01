@@ -3,7 +3,7 @@ IMAGE_NAME ?= perftest-toolkit:$(IMAGE_TAG)
 REGISTRY ?= quay.io/3scale
 
 build:
-	rake build -v
+	bundle exec rake build -v
 	docker build -t $(IMAGE_NAME) .
 
 push:
