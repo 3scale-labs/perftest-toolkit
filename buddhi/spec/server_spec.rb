@@ -2,6 +2,7 @@ require 'amp/toolkit/buddhi'
 
 RSpec.describe AMP::Toolkit::Buddhi::Server do
   let(:test_plan) { instance_double(AMP::Toolkit::Buddhi::Simple::TestPlan) }
+  let(:metric_reporter) { instance_double(AMP::Toolkit::Buddhi::MetricReporter) }
 
   context 'bootstrap' do
     let(:server) { instance_double(WEBrick::HTTPServer) }
@@ -12,18 +13,19 @@ RSpec.describe AMP::Toolkit::Buddhi::Server do
       expect(server).to receive(:mount_proc).with('/admin/api/services/', anything)
       expect(server).to receive(:mount_proc).with('/paths/amp', anything)
       expect(server).to receive(:mount_proc).with('/paths/backend', anything)
+      expect(server).to receive(:mount_proc).with('/report/amp', anything)
       expect(server).to receive(:start)
       expect(WEBrick::HTTPServer).to receive(:new).with(Port: 80).and_return(server)
     end
 
     it 'run' do
-      AMP::Toolkit::Buddhi::Server.run test_plan
+      AMP::Toolkit::Buddhi::Server.run test_plan, metric_reporter
     end
   end
 
   context 'api endpoints' do
     let(:resp) { WEBrick::HTTPResponse.new WEBrick::Config::HTTP }
-    let(:server) { described_class.new test_plan }
+    let(:server) { described_class.new test_plan, metric_reporter }
     let(:services) { [{ id: 'svcA' }, { id: 'svcA' }] }
     let(:service) { { id: 'svc_a' } }
 
