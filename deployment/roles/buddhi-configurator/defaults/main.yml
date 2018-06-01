@@ -7,4 +7,4 @@ buddhi_backend_uri: http://backend-listener:3000
 buddhi_backend_username: "<backend_username>"
 buddhi_backend_pass: "<backend_basic_auth_pass>"
 buddhi_upstream_uri: "<upstream_uri>"
-buddhi_wilcard_domain: "<wildcard_domain>"
+buddhi_wildcard_domain: "<wildcard_domain>"
