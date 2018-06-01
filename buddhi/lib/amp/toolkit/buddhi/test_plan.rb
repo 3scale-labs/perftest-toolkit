@@ -152,6 +152,22 @@ module AMP
 
           backend_uri(query)
         end
+
+        def metric_report(service_id, path)
+          return {} unless @services.key? service_id
+          service = @services[service_id]
+          parent_metric = service[:metrics].values.first
+          proxy_rules = apicast_service_obj(@services[service_id])[:proxy][:proxy_rules]
+          matching_rules = proxy_rules.select { |r| filter_matching_rule(r, path) }
+          matching_rules.each_with_object(Hash.new(0)) do |rule, acc|
+            acc[parent_metric[:name]] += 1
+            acc[rule[:metric_system_name]] += rule[:delta]
+          end
+        end
+
+        def filter_matching_rule(rule, path)
+          !/#{rule[:pattern]}/.match(path).nil?
+        end
       end
     end
   end

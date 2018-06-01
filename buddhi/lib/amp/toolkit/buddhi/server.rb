@@ -4,15 +4,17 @@ module AMP
   module Toolkit
     module Buddhi
       class Server
-        attr_reader :test_plan, :services_info
+        attr_reader :test_plan, :services_info, :metric_report
 
-        def initialize(test_plan)
+        def initialize(test_plan, metric_report)
           @test_plan = test_plan
+          @metric_report = metric_report
           @server = WEBrick::HTTPServer.new Port: test_plan.http_port
           @server.mount_proc '/admin/api/services.json', method(:services)
           @server.mount_proc '/admin/api/services/', method(:service)
           @server.mount_proc '/paths/amp', method(:amp_paths)
           @server.mount_proc '/paths/backend', method(:backend_paths)
+          @server.mount_proc '/report/amp', method(:amp_report)
         end
 
         def start
@@ -47,8 +49,13 @@ module AMP
           res.body = Array.new(num_lines) { test_plan_method.call }.join("\n")
         end
 
-        def self.run(test_plan)
-          new(test_plan).start
+        def amp_report(req, res)
+          filedata = req.query['filename']
+          res.body = { metrics: metric_report.report(filedata) }.to_json
+        end
+
+        def self.run(test_plan, metric_report)
+          new(test_plan, metric_report).start
         end
       end
     end
