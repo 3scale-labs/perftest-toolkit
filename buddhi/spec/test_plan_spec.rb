@@ -214,4 +214,62 @@ RSpec.describe AMP::Toolkit::Buddhi::TestPlan do
       expect(subject.backend_path).to match(/\/transactions\/authrep.xml\?provider_key=some_prov_key_[ab]&service_id=id[AB]&user_key=key_[ab](&usage%5Bm_[ab]_1%5D=1)*/)
     end
   end
+
+  context 'metric report' do
+    let(:services) do
+      {
+        'idA' => {
+          id: 'idA',
+          backend_version: 1,
+          provider_key: 'some_prov_key_a',
+          metrics: {
+            hits: {
+              name: 'hits'
+            },
+            m_a: {
+              name: 'm_a'
+            },
+            m_b: {
+              name: 'm_b'
+            },
+            m_c: {
+              name: 'm_c'
+            }
+          },
+          application_keys: [{ user_key: 'key_a' }]
+        }
+      }
+    end
+
+    subject { AMP::Toolkit::Buddhi::Saas::TestPlan.new services, opts }
+
+    it 'service does not match' do
+      expect(subject.metric_report('idB', '/1')).to eq({})
+    end
+
+    it 'path does not match' do
+      expect(subject.metric_report('idA', '/jdjdjd')).to eq({})
+      expect(subject.metric_report('idA', '/j1')).to eq({})
+    end
+
+    it 'one metric match' do
+      expect(subject.metric_report('idA', '/1')).to eq('hits' => 1, 'm_a' => 1)
+      expect(subject.metric_report('idA', '/1jasjjs')).to eq('hits' => 1, 'm_a' => 1)
+    end
+    it 'two metric match' do
+      expect(subject.metric_report('idA', '/11')).to eq('hits' => 2, 'm_a' => 1, 'm_b' => 1)
+    end
+    it 'three metric match' do
+      expect(subject.metric_report('idA', '/111')).to eq('hits' => 3,
+                                                         'm_a' => 1,
+                                                         'm_b' => 1,
+                                                         'm_c' => 1)
+    end
+    it 'more than three metric match' do
+      expect(subject.metric_report('idA', '/11111111')).to eq('hits' => 3,
+                                                              'm_a' => 1,
+                                                              'm_b' => 1,
+                                                              'm_c' => 1)
+    end
+  end
 end
