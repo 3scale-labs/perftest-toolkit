@@ -352,7 +352,26 @@ By default, injector will perform HTTP requests to the port 80 of the target hos
 ansible-playbook -i hosts injector.yml
 ```
 
-After this, the injector should be already configured and available using the **/usr/local/bin/3scale-perftest** binary (see ‘Run tests’ section)
+* injector privileges
+
+So far, the injector should be already configured and available using the **/usr/local/bin/3scale-perftest** tool (see ‘Run tests’ section).
+
+This tool is running docker container behind the scenes. Thus, the user running the tool should have permission to run docker.
+If running as root is not an option, docker can be managed to run as non-root user. Follow the section
+*Manage Docker as a non-root user* of the [following guide](https://docs.docker.com/install/linux/linux-postinstall/).
+
+TL;DR
+
+```bash
+# Create the docker group.
+$ sudo groupadd docker
+
+# Add your user to the docker group.
+$ sudo usermod -aG docker $USER
+
+# Restart docker service for systemd-based OS
+$ sudo systemctl restart docker.service
+```
 
 ## Run tests
 
