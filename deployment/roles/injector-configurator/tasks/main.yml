@@ -3,3 +3,4 @@
 
 - include: build-image.yml
 - include: configure-injector.yml
+- include: manage-docker-as-non-root.yml

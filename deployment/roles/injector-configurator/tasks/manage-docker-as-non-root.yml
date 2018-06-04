@@ -1,0 +1,17 @@
+---
+
+- name: Create the docker group
+  group:
+    name: docker
+    state: present
+
+- name: Add your user to the docker group
+  user:
+    name: "{{ansible_user}}"
+    append: yes
+    groups: docker
+
+- name: restart service docker.service
+  systemd:
+    name: docker.service
+    state: restarted
