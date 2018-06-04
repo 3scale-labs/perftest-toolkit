@@ -249,12 +249,18 @@ buddhi ansible_host=<buddhi_uri> ansible_user=centos
 * Configure AMP backend uri
   * Go to Openshift dashboard, go to *Applications* -> *Routes*.
   * Get *Hostname* value of route named *backend-route*.
-  * Fill **buddhi_internal_api_uri** with that value.
+  * Fill **buddhi_internal_api_uri** with that value. URI should include protocol, host and port if required.
 
 ```
 File: roles/buddhi-configurator/defaults/main.yml
 
 buddhi_internal_api_uri: "<backend_uri>"
+```
+
+For example
+
+```
+buddhi_internal_api_uri: "http://backend.perftest.3sca.net"
 ```
 
 * AMP backend service basic authentication
@@ -286,10 +292,18 @@ buddhi_traffic_profile: [ simple | onprem | saas ]
 Private address of the upstream API that will be called by the API gateway.
 Check available [*echo-api* service deployment section](#deploy-&-setup-upstream-api) if you do not want to test with your own api service.
 
+URI address should include protocol, host and port if required.
+
 ```
 File: roles/buddhi-configurator/defaults/main.yml
 
 buddhi_upstream_uri: "<your-api-uri>"
+```
+
+For example
+
+```
+buddhi_upstream_uri: "http://echo-api.3scale.net"
 ```
 
 * Configure wildcard domain
@@ -345,7 +359,7 @@ File: roles/injector-configurator/defaults/main.yml
 Injector_jmeter_target_host: myroutehostname.com
 ```
 
-By default, injector will perform HTTP requests to the port 80 of the target host. You can change this by editing the *injector_jmeter_protocol* (http/https) and *injector_jmeter_target_port* parameters.
+By default, injector will perform HTTP requests to the port **80** of the target host. You can change this by editing the *injector_jmeter_protocol* (http/https) and *injector_jmeter_target_port* parameters.
 
 * Execute the playbook that installs and configures the injector via Ansible
 ```bash
