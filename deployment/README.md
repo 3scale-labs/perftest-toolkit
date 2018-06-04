@@ -352,12 +352,14 @@ File: hosts
 injector ansible_host=myinjectorhost.addr.com ansible_user=centos
 ```
 
-* Edit the **injector_jmeter_target_host** parameter replacing *<jmeter_target_host>* with the route endpoint of the AMP gateway. For example:
+* Edit the **injector_jmeter_target_host** parameter replacing *<jmeter_target_host>* with the route endpoint of the AMP gateway.
 ```
 File: roles/injector-configurator/defaults/main.yml
 
-Injector_jmeter_target_host: myroutehostname.com
+injector_jmeter_target_host: <jmeter_target_host>
 ```
+
+This is just hostname, IP address or domain name. Do not include port.
 
 By default, injector will perform HTTP requests to the port **80** of the target host. You can change this by editing the *injector_jmeter_protocol* (http/https) and *injector_jmeter_target_port* parameters.
 
@@ -399,3 +401,110 @@ $ 3scale-perftest -r 10000 -d 600 -t 50
 
 The test results of the last execution are automatically stored in **/opt/3scale-perftest/reports**.
 This directory can be obtained and then the **report/index.html** can be opened to view the results.
+
+## Troubleshooting
+
+Sometimes, even though all deployment commands run successfully, performance traffic may be broken.
+This might be due to misconfiguration in any stage of the deployment process.
+When performance HTTP traffic response codes are not as expected, i.e. **200 OK**,
+there are few checks that can be very handy to find out configuration mistakes.
+
+### Check virtual host configuration and wildcard route
+
+First, scale down *apicast-production* service to just one pod.
+
+Monitor pod's logs for traffic accesslog.
+
+```bash
+oc logs -f apicast-gateway-podId
+```
+
+[Run tests](#run-tests) and check for logs.
+
+If no logs are shown, openshift routers are discarding traffic based on configured routes.
+
+* First check AMP gateway has been corretly configured.
+```
+File: roles/injector-configurator/defaults/main.yml
+
+injector_jmeter_target_host: <jmeter_target_host>
+```
+
+* Check wildcard configuration.
+
+  * Go to AMP project.
+  * Go to *Applications* -> *Routes*
+
+The *apicast-wildcard-router-route* route must match with the following configuration in deployment templates:
+
+```
+File: roles/buddhi-configurator/defaults/main.yml
+
+buddhi_wildcard_domain: benchmark.<OCP_domain>
+```
+
+### Check apicast gateway configuration
+
+First, scale down *apicast-production* service to just one pod.
+
+Monitor pod's logs for traffic accesslog.
+
+```bash
+oc logs -f apicast-gateway-podId
+```
+
+[Run tests](#run-tests) and check for logs.
+
+Check response codes on accesslog.
+
+If response codes are *403 Forbidden*, then configured virtual host do not match traffic *Host* header.
+
+If response codes are *404 Not Found*, then proxy-rules do not match traffic path.
+
+In any case, seems that *apicast gateway* does not have latest configuration.
+Pods restart is required or wait until process fetches new configuration based on
+*APICAST_CONFIGURATION_CACHE* apicast configuration parameter.
+
+Restart is easily done downscaling to 0 and then scaling back to desired number of pods.
+
+```bash
+$ oc scale dc apicast-production --replicas=0
+$ oc scale dc apicast-production --replicas=2
+```
+
+### Check backend listener traffic
+
+First, scale down *backend-listener* service to just one pod.
+
+Monitor pod's logs for traffic accesslog.
+
+```bash
+oc logs -f backend-listener-podId
+```
+
+[Run tests](#run-tests) and check for logs.
+
+If no logs are shown, check [gateway troubleshooting section](#check-apicast-gateway-configuration)
+
+If logs are shown, check response codes on accesslog. Other than *200 OK* means, *redis* is down,
+*redis* address is misconfigured in *backend-listener* or
+redis does not have required data to authenticate requests.
+[Test Configurator](#deploy-&-run-test-configurator) must deployed again. Later,
+[injector](#Deploy-&-Setup-Injector) must be deployed again as well.
+
+### Check upstream service traffic
+
+When *backend-listener* accesslog shows requests are being answered with *200 OK* response codes,
+the last usual suspect is upstream or upstream configuration.
+
+Check *upstream* uri is correctly configured.
+
+```
+File: roles/buddhi-configurator/defaults/main.yml
+
+buddhi_upstream_uri: "<your-api-uri>"
+```
+
+Check *upstream* is reachable from *apicast-gateway* pods, thus, no network, DNS or routing issue is happening.
+
+Check *upstream* process is up and runnig on its host and listening on expected port (usually **8081**).
