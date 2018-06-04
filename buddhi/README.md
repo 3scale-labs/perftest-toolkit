@@ -40,7 +40,7 @@ $ curl http://127.0.0.1:8089/paths/amp?lines=1
 ```
  - POST **/report/amp**: Send traffic file and generate metric counter report.
 ```bash
-$ $ curl -F 'filename=@traffic.csv' http://127.0.0.1:8089/report/amp 2>/dev/null | jq '.'
+$ curl -X POST --data-binary "@traffic.csv" http://127.0.0.1:8089/report/amp 2>/dev/null | jq '.'
 {
   "metrics": {
     "24b08f30-403e-4be7-83d8-984d6e93b91a": 7,
