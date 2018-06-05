@@ -22,3 +22,5 @@ test:
 clean:
 	bundle clean
 	rm -rf vendor
+	rm -rf pkg
+	rm -rf coverage
