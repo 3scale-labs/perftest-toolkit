@@ -26,7 +26,7 @@ The steps to follow to be able to execute performance tests are:
 1. Deploy & Setup Injector
 1. Run tests
 
-## Deployment & Setup provisioning tool
+## Deployment of provisioning tool
 
 Ansible is used for easy and quick setup. The objective is make it easy for the users the deployment and setup of all the components.
 
@@ -48,7 +48,7 @@ The required Ansible version and 3scale performance testing ansible project must
 
 From now on, relative paths that appear in this document will be relative to the ’deployment’ directory of the 3scale performance testing ansible project in the coming sections unless otherwise noted.
 
-## Deploy & Setup Upstream API
+## Deploy Upstream API
 
 If you don’t want to use your own Upstream API, the following steps show how to configure the *echo-api* Upstream test API:
 
@@ -115,7 +115,7 @@ Accept: */*
 * Connection #0 to host 127.0.0.1 left intact
 ```
 
-## Deploy & Setup Openshift platform
+## Deploy Openshift platform
 
 Installation and setup of OCP is out of scope of this document.
 However it is worth noting that there are many aspects from the process that might affect performance tests results.
@@ -129,7 +129,7 @@ Among others:
 
 There is a comprehensive [installation guide for release 3.7](https://docs.openshift.com/container-platform/3.7/install_config/index.html).
 
-## Deploy & Setup 3Scale AMP
+## Deploy 3Scale AMP
 
 Deployment and setup of 3Scale AMP is out of scope of this document.
 However it is worth noting that there are many aspects from the process that might affect performance tests results. Specifically:
@@ -218,7 +218,7 @@ Check *Secure Route* when *https* is used
 ```
   * Push on *Save* button.
 
-## Deploy & Run Test Configurator
+## Deploy Test Configurator
 
 Test configurator (a.k.a. [**buddhi**](/buddhi)) is a service with the following responsibilities:
 
@@ -249,12 +249,18 @@ buddhi ansible_host=<buddhi_uri> ansible_user=centos
 * Configure AMP backend uri
   * Go to Openshift dashboard, go to *Applications* -> *Routes*.
   * Get *Hostname* value of route named *backend-route*.
-  * Fill **buddhi_internal_api_uri** with that value.
+  * Fill **buddhi_internal_api_uri** with that value. URI should include protocol, host and port if required.
 
 ```
 File: roles/buddhi-configurator/defaults/main.yml
 
 buddhi_internal_api_uri: "<backend_uri>"
+```
+
+For example
+
+```
+buddhi_internal_api_uri: "http://backend.perftest.3sca.net"
 ```
 
 * AMP backend service basic authentication
@@ -284,12 +290,20 @@ buddhi_traffic_profile: [ simple | onprem | saas ]
 * Configure upstream api url
 
 Private address of the upstream API that will be called by the API gateway.
-Check available [*echo-api* service deployment section](#deploy-&-setup-upstream-api) if you do not want to test with your own api service.
+Check available [*echo-api* service deployment section](#deploy-upstream-api) if you do not want to test with your own api service.
+
+URI address should include protocol, host and port if required.
 
 ```
 File: roles/buddhi-configurator/defaults/main.yml
 
 buddhi_upstream_uri: "<your-api-uri>"
+```
+
+For example
+
+```
+buddhi_upstream_uri: "http://echo-api.3scale.net"
 ```
 
 * Configure wildcard domain
@@ -317,7 +331,7 @@ Change apicast gateway deployment config
 
 On deployment config change, apicast-production pods should *reboot* automatically. Otherwise, force them manually.
 
-## Deploy & Setup Injector
+## Deploy Injector
 
 Injector host’s hardware resources should not be performance tests bottleneck. Enough cpu, memory and network resources should be available.
 
@@ -338,14 +352,16 @@ File: hosts
 injector ansible_host=myinjectorhost.addr.com ansible_user=centos
 ```
 
-* Edit the **injector_jmeter_target_host** parameter replacing *<jmeter_target_host>* with the route endpoint of the AMP gateway. For example:
+* Edit the **injector_jmeter_target_host** parameter replacing *<jmeter_target_host>* with the route endpoint of the AMP gateway.
 ```
 File: roles/injector-configurator/defaults/main.yml
 
-Injector_jmeter_target_host: myroutehostname.com
+injector_jmeter_target_host: <jmeter_target_host>
 ```
 
-By default, injector will perform HTTP requests to the port 80 of the target host. You can change this by editing the *injector_jmeter_protocol* (http/https) and *injector_jmeter_target_port* parameters.
+This is just hostname, IP address or domain name. Do not include port.
+
+By default, injector will perform HTTP requests to the port **80** of the target host. You can change this by editing the *injector_jmeter_protocol* (http/https) and *injector_jmeter_target_port* parameters.
 
 * Execute the playbook that installs and configures the injector via Ansible
 ```bash
@@ -404,3 +420,127 @@ $ 3scale-perftest -r 10000 -d 600 -t 50
 
 The test results of the last execution are automatically stored in **/opt/3scale-perftest/reports**.
 This directory can be obtained and then the **report/index.html** can be opened to view the results.
+
+## Troubleshooting
+
+Sometimes, even though all deployment commands run successfully, performance traffic may be broken.
+This might be due to a misconfiguration in any stage of the deployment process.
+When performance HTTP traffic response codes are not as expected, i.e. **200 OK**,
+there are few checks that can be very handy to find out configuration mistakes.
+
+### Check virtual host configuration and wildcard route
+
+First, scale down *apicast-production* service to just one pod.
+
+Monitor pod's logs for traffic accesslog.
+
+```bash
+oc logs -f apicast-productions-X-podId
+```
+
+[Run tests](#run-tests) and check for logs.
+
+If no logs are shown, openshift routers are discarding traffic based on configured routes.
+
+* Check AMP gateway has been corretly configured. Host should be just IP address/DNS name.
+```
+File: roles/injector-configurator/defaults/main.yml
+
+injector_jmeter_target_host: <jmeter_target_host>
+```
+
+If *injector_jmeter_target_host* parameter is changed, ansible playbook has to be re-run.
+
+```
+ansible-playbook -i hosts injector.yml
+```
+
+* Check wildcard configuration.
+
+  * Go to AMP project.
+  * Go to *Applications* -> *Routes*
+
+The *apicast-wildcard-router-route* route must match with the following configuration in the deployment templates:
+
+```
+File: roles/buddhi-configurator/defaults/main.yml
+
+buddhi_wildcard_domain: benchmark.<OCP_domain>
+```
+
+If *buddhi_wildcard_domain* parameter is changed, both ansible playbooks have to be re-run.
+
+```
+ansible-playbook -i hosts buddhi.yml
+ansible-playbook -i hosts injector.yml
+```
+
+### Check apicast gateway configuration
+
+First, scale down *apicast-production* service to just one pod.
+
+Monitor pod's logs for traffic accesslog.
+
+```bash
+oc logs -f apicast-gateway-podId
+```
+
+[Run tests](#run-tests) and check for logs.
+
+Check response codes on accesslog.
+
+If accesslog shows *could not find service for host* error, then the configured virtual hosts do not match traffic *Host* header. For example:
+```
+2018/06/05 13:32:41 [warn] 25#25: *883 [lua] errors.lua:43: get_upstream(): could not find service for host: 9ccd143c-dbe4-471c-9bce-41df7dde8d99.benchmark.perftest.3sca.net, client: 10.130.4.1, server: _, request: "GET /855aaf5c-a199-4145-a3ab-ea9402cc35db/some-request?user_key=32313d20d99780a5 HTTP/1.1", host: "9ccd143c-dbe4-471c-9bce-41df7dde8d99.benchmark.perftest.3sca.net"
+```
+Another issue might be when response codes are *404 Not Found*.Then proxy-rules do not match traffic path.
+
+In anyone of the previous cases, it seems that *apicast gateway* does not have latest configuration.
+Pods restart is required or wait until process fetches new configuration based on
+*APICAST_CONFIGURATION_CACHE* apicast configuration parameter.
+
+Restart is easily done downscaling to 0 and then scaling back to desired number of pods.
+
+```bash
+$ oc scale dc apicast-production --replicas=0
+$ oc scale dc apicast-production --replicas=2
+```
+
+### Check backend listener traffic
+
+First, scale down *backend-listener* service to just one pod.
+
+Monitor pod's logs for traffic accesslog.
+
+```bash
+oc logs -f backend-listener-X-podId
+```
+
+[Run tests](#run-tests) and check for logs.
+
+If no logs are shown, check [gateway troubleshooting section](#check-apicast-gateway-configuration)
+
+If logs are shown, check response codes on accesslog. Other than *200 OK* means
+- *redis* is down,
+- *redis* address is misconfigured in *backend-listener*
+- redis does not have required data to authenticate requests
+
+[Test Configurator](#deploy-test-configurator) must be deployed again. Later,
+[injector](#deploy-injector) must be deployed again as well.
+
+### Check upstream service traffic
+
+When *backend-listener* accesslog shows requests are being answered with *200 OK* response codes,
+the last usual suspect is upstream or upstream configuration.
+
+Check *upstream* uri is correctly configured. URI should include protocol, host and port if required.
+
+```
+File: roles/buddhi-configurator/defaults/main.yml
+
+buddhi_upstream_uri: "<your-api-uri>"
+```
+
+Check *upstream* is reachable from *apicast-gateway* pods, thus, no network, DNS or routing issue is happening.
+
+Check *upstream* process is up and running on its host and listening on expected port (usually **8081**).
