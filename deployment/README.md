@@ -544,3 +544,25 @@ buddhi_upstream_uri: "<your-api-uri>"
 Check *upstream* is reachable from *apicast-gateway* pods, thus, no network, DNS or routing issue is happening.
 
 Check *upstream* process is up and running on its host and listening on expected port (usually **8081**).
+
+## Sustained load
+
+Some performance test are looking for *peak* and *sustained* traffic maximum performance.
+*Sustained* traffic is defined as traffic load where *Job Queue* size is always at low levels, or even empty.
+For *sustained* traffic performance benchmark, *Job Queue* must be monitorized.
+
+This is a small guideline to monitor *Job Queue* size:
+
+- Get backend redis pod
+
+```bash
+$ oc get pods | grep redis
+backend-redis-2-nkrkk         1/1       Running   0          14d
+```
+
+- Get Job Queue size
+
+```bash
+$ oc rsh backend-redis-2-nkrkk /bin/sh -i -c 'redis-cli -n 1 llen resque:queue:priority'
+(integer) 0
+```
