@@ -50,7 +50,7 @@ module AMP
         end
 
         def amp_report(req, res)
-          res.body = { metrics: metric_report.report(req.body) }.to_json
+          res.body = metric_report.report(req.body).to_json
         end
 
         def self.run(test_plan, metric_report)
