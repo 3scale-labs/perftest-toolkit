@@ -405,7 +405,7 @@ This directory can be obtained and then the **report/index.html** can be opened 
 ## Troubleshooting
 
 Sometimes, even though all deployment commands run successfully, performance traffic may be broken.
-This might be due to misconfiguration in any stage of the deployment process.
+This might be due to a misconfiguration in any stage of the deployment process.
 When performance HTTP traffic response codes are not as expected, i.e. **200 OK**,
 there are few checks that can be very handy to find out configuration mistakes.
 
@@ -435,7 +435,7 @@ injector_jmeter_target_host: <jmeter_target_host>
   * Go to AMP project.
   * Go to *Applications* -> *Routes*
 
-The *apicast-wildcard-router-route* route must match with the following configuration in deployment templates:
+The *apicast-wildcard-router-route* route must match with the following configuration in the deployment templates:
 
 ```
 File: roles/buddhi-configurator/defaults/main.yml
@@ -457,11 +457,11 @@ oc logs -f apicast-gateway-podId
 
 Check response codes on accesslog.
 
-If response codes are *403 Forbidden*, then configured virtual host do not match traffic *Host* header.
+If response codes are *403 Forbidden*, then the configured virtual hosts do not match traffic *Host* header.
 
 If response codes are *404 Not Found*, then proxy-rules do not match traffic path.
 
-In any case, seems that *apicast gateway* does not have latest configuration.
+In any case, it seems that *apicast gateway* does not have latest configuration.
 Pods restart is required or wait until process fetches new configuration based on
 *APICAST_CONFIGURATION_CACHE* apicast configuration parameter.
 
@@ -489,7 +489,7 @@ If no logs are shown, check [gateway troubleshooting section](#check-apicast-gat
 If logs are shown, check response codes on accesslog. Other than *200 OK* means, *redis* is down,
 *redis* address is misconfigured in *backend-listener* or
 redis does not have required data to authenticate requests.
-[Test Configurator](#deploy-&-run-test-configurator) must deployed again. Later,
+[Test Configurator](#deploy-&-run-test-configurator) must be deployed again. Later,
 [injector](#Deploy-&-Setup-Injector) must be deployed again as well.
 
 ### Check upstream service traffic
@@ -507,4 +507,4 @@ buddhi_upstream_uri: "<your-api-uri>"
 
 Check *upstream* is reachable from *apicast-gateway* pods, thus, no network, DNS or routing issue is happening.
 
-Check *upstream* process is up and runnig on its host and listening on expected port (usually **8081**).
+Check *upstream* process is up and running on its host and listening on expected port (usually **8081**).
