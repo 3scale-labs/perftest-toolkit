@@ -36,22 +36,53 @@ $ curl http://127.0.0.1:8089/paths/backend?lines=1
  - **/paths/amp**: CSV formatted file with **Host, Path*^** header. Add *lines* query param for any number of valid random requests.
 ```bash
 $ curl http://127.0.0.1:8089/paths/amp?lines=1
-"30dd63c1-4ee9-481e-b0ed-e7d10d4900c9","/1?user_key=2c6e8625ed43d064"
+"53f07c14-e35e-4bfa-b0b1-9d3a993fad14.benchmark.3sca.net","/1?app_id=6641c22185bbf204&app_key=3d0112323ceef116"
 ```
  - POST **/report/amp**: Send traffic file and generate metric counter report.
+
+Report shows usage for every metric involved in traffic.
+
+Format
+```
+{ service_id => { metric_id: counter} }
+```
+
+Traffic information can be generated using */paths/amp* endpoint as follows:
+
 ```bash
-$ curl -X POST --data-binary "@traffic.csv" http://127.0.0.1:8089/report/amp 2>/dev/null | jq '.'
+$ curl http://127.0.0.1:8089/paths/amp?lines=5 2>/dev/null > traffic.csv
+$ cat traffic.csv
+"53f07c14-e35e-4bfa-b0b1-9d3a993fad14.benchmark.3sca.net","/1?app_id=ddfa9a8842a3822e&app_key=73418183a69b027a"
+"e75ef4f7-54da-4ec6-a4b2-33a163764385.benchmark.3sca.net","/1?app_id=5e4618aa57d801cd&app_key=fe4db52e5e86668f"
+"e75ef4f7-54da-4ec6-a4b2-33a163764385.benchmark.3sca.net","/11?app_id=ceeeb23abfd0adfd&app_key=fbdfae99a587811e"
+"31b75b9b-fbb4-4223-8736-b93c34676f04.benchmark.3sca.net","/1?user_key=aa5736e41a3888db"
+"e75ef4f7-54da-4ec6-a4b2-33a163764385.benchmark.3sca.net","/111?app_id=ca2f8ff8b0a8707c&app_key=4b349db5bb77b9db"
+```
+
+Then, metric report can be generated requesting */report/amp* endpoint as follows:
+
+```bash
+$ curl -X POST --data-binary "@traffic.csv" http://127.0.0.1:8089/report/amp 2>/dev/null
+{"53f07c14-e35e-4bfa-b0b1-9d3a993fad14":{"6527c16b-dfeb-46e7-93d8-4eef0a6abbe3":1,"0dfb13fa-410e-4394-9fad-f0b785e1e680":1},"e75ef4f7-54da-4ec6-a4b2-33a163764385":{"dabdb86c-5344-4ff5-b8c7-65740357ecc6":6,"439402ef-ee9a-4c2a-856e-59928a3cef10":3,"e7265d03-efa7-4641-80b6-6d4a0d44713b":2,"937ebcef-1afd-4498-91a7-696c069f4668":1},"31b75b9b-fbb4-4223-8736-b93c34676f04":{"267c1777-53f7-4568-b9c0-2af28571a1dc":1,"2641b733-2030-4fac-9248-c1b8d3a4f02b":1}}
+```
+
+Pretty printed
+
+```json
 {
-  "metrics": {
-    "24b08f30-403e-4be7-83d8-984d6e93b91a": 7,
-    "406127d9-0db7-4c77-8971-405f75ae94aa": 5,
-    "7c1b7719-518c-45dc-9fd7-cbd56a7b921e": 2,
-    "ce116219-2b63-4b6b-abb5-d52167be17cd": 2,
-    "e28ae3f1-c3dd-43c9-8b66-52ea33b02e91": 6,
-    "a53593fa-5d79-477b-a364-d6d3e6718b96": 3,
-    "9cd322bd-ed72-490c-8a1b-cf1fc1831ce5": 2,
-    "426d164f-2c87-4434-9d10-e6728024f422": 1,
-    "1f47cdce-f802-46ce-bc11-8139f9d09612": 2
+  "53f07c14-e35e-4bfa-b0b1-9d3a993fad14": {
+    "6527c16b-dfeb-46e7-93d8-4eef0a6abbe3": 1,
+    "0dfb13fa-410e-4394-9fad-f0b785e1e680": 1
+  },
+  "e75ef4f7-54da-4ec6-a4b2-33a163764385": {
+    "dabdb86c-5344-4ff5-b8c7-65740357ecc6": 6,
+    "439402ef-ee9a-4c2a-856e-59928a3cef10": 3,
+    "e7265d03-efa7-4641-80b6-6d4a0d44713b": 2,
+    "937ebcef-1afd-4498-91a7-696c069f4668": 1
+  },
+  "31b75b9b-fbb4-4223-8736-b93c34676f04": {
+    "267c1777-53f7-4568-b9c0-2af28571a1dc": 1,
+    "2641b733-2030-4fac-9248-c1b8d3a4f02b": 1
   }
 }
 ```
