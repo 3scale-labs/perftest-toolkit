@@ -82,15 +82,14 @@ RSpec.describe AMP::Toolkit::Buddhi::Server do
     it 'amp_report method returns metrics report' do
       expect(test_plan).to receive(:http_port).and_return(6664)
       body = '"82755f4b.benchmark.3sca.net","/1?user_key=86fafe7d3702f36d"'
-      expect(metric_reporter).to receive(:report).with(body).and_return('REPORT')
-      req = server_build_post_request('/report/amp',
-                                      body)
+      expected_resp_body = { 'svc_a' => { 'm_a' => 1 } }
+      expect(metric_reporter).to receive(:report).with(body).and_return(expected_resp_body)
+      req = server_build_post_request('/report/amp', body)
       server.amp_report(req, resp)
       # Check returned services are expected ones
       expect(resp.body).to be
       parsed_response = JSON.parse(resp.body)
-      expect(parsed_response).to have_key('metrics')
-      expect(parsed_response['metrics']).to eq('REPORT')
+      expect(parsed_response).to eq(expected_resp_body)
     end
   end
 end
