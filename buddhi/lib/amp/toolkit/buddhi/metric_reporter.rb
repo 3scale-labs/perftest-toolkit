@@ -10,8 +10,11 @@ module AMP
         end
 
         def report(data)
-          CSV.parse(data).map(&method(:parse)).each_with_object({}) do |(service_id, path), hsh|
-            hsh.merge!(test_plan.metric_report(service_id, path)) { |_, old, new| old + new }
+          # hash default value will always be one and the same object
+          # initializing with a block like that,
+          # hash['key'].merge!(some_hash) will keep updates in hash
+          CSV.parse(data).map(&method(:parse)).each_with_object(Hash.new { |hash, key| hash[key] = {} }) do |(service_id, path), acc|
+            acc[service_id].merge!(test_plan.metric_report(service_id, path)) { |_, old, new| old + new }
           end
         end
 
