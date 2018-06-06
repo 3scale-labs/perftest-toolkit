@@ -1,5 +1,27 @@
 # 3Scale AMP service setup for testing
 
+## Table of Contents
+
+* [Introduction](#introduction)
+* [High level overview](#high-level-overview)
+* [Deployment of provisioning tool](#deployment-of-provisioning-tool)
+* [Deploy Upstream API](#deploy-upstream-api)
+* [Deploy Openshift platform](#deploy-openshift-platform)
+* [Deploy 3Scale AMP](#deploy-3scale-amp)
+  * [Configuration 3Scale AMP](#configuration-3scale-amp)
+  * [Wildcard route](#wildcard-route)
+* [Deploy Test Configurator](#deploy-test-configurator)
+* [Deploy Injector](#deploy-injector)
+* [Run tests](#run-tests)
+* [Troubleshooting](#troubleshooting)
+  * [Check virtual host configuration and wildcard route](#check-virtual-host-configuration-and-wildcard-route)
+  * [Check apicast gateway configuration](#check-apicast-gateway-configuration)
+  * [Check backend listener traffic](#check-backend-listener-traffic)
+  * [Check upstream service traffic](#check-upstream-service-traffic)
+* [Sustained load](#sustained-load)
+
+Generated using [github-markdown-toc](https://github.com/ekalinin/github-markdown-toc)
+
 ## Introduction
 
 This documents aims to provide comprehensive guide of the setup and execution of performance tests.
