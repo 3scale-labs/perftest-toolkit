@@ -2,6 +2,7 @@ require 'amp/toolkit/buddhi'
 
 RSpec.describe AMP::Toolkit::Buddhi::Server do
   let(:test_plan) { instance_double(AMP::Toolkit::Buddhi::Simple::TestPlan) }
+  let(:metric_reporter) { instance_double(AMP::Toolkit::Buddhi::MetricReporter) }
 
   context 'bootstrap' do
     let(:server) { instance_double(WEBrick::HTTPServer) }
@@ -12,25 +13,26 @@ RSpec.describe AMP::Toolkit::Buddhi::Server do
       expect(server).to receive(:mount_proc).with('/admin/api/services/', anything)
       expect(server).to receive(:mount_proc).with('/paths/amp', anything)
       expect(server).to receive(:mount_proc).with('/paths/backend', anything)
+      expect(server).to receive(:mount_proc).with('/report/amp', anything)
       expect(server).to receive(:start)
       expect(WEBrick::HTTPServer).to receive(:new).with(Port: 80).and_return(server)
     end
 
     it 'run' do
-      AMP::Toolkit::Buddhi::Server.run test_plan
+      AMP::Toolkit::Buddhi::Server.run test_plan, metric_reporter
     end
   end
 
   context 'api endpoints' do
     let(:resp) { WEBrick::HTTPResponse.new WEBrick::Config::HTTP }
-    let(:server) { described_class.new test_plan }
+    let(:server) { described_class.new test_plan, metric_reporter }
     let(:services) { [{ id: 'svcA' }, { id: 'svcA' }] }
     let(:service) { { id: 'svc_a' } }
 
     it 'services method returns list of services' do
       expect(test_plan).to receive(:http_port).and_return(6660)
       expect(test_plan).to receive(:services).and_return(services)
-      req = server_build_request '/admin/api/services.json'
+      req = server_build_get_request '/admin/api/services.json'
       server.services(req, resp)
       # Check returned services are expected ones
       expect(resp.body).to be
@@ -47,7 +49,7 @@ RSpec.describe AMP::Toolkit::Buddhi::Server do
       # /admin/api/services/svc_a
       # api endpoint is mounted on /admin/api/services
       # req.path_info is based on /svc_a
-      req = server_build_request '/svc_a'
+      req = server_build_get_request '/svc_a'
       server.service(req, resp)
       # Check returned service info is expected one
       parsed_response = JSON.parse(resp.body)
@@ -60,7 +62,7 @@ RSpec.describe AMP::Toolkit::Buddhi::Server do
     it 'amp_paths method returns host and path as csv format' do
       expect(test_plan).to receive(:http_port).and_return(6662)
       expect(test_plan).to receive(:amp_path).exactly(5).times.and_return('"some_host", "/some_path"')
-      req = server_build_request '/?lines=5'
+      req = server_build_get_request '/?lines=5'
       server.amp_paths(req, resp)
       # Check response body is several lines as csv format
       expect(resp.body.lines.count).to eq(5)
@@ -70,11 +72,24 @@ RSpec.describe AMP::Toolkit::Buddhi::Server do
     it 'backend_paths method returns backend paths' do
       expect(test_plan).to receive(:http_port).and_return(6663)
       expect(test_plan).to receive(:backend_path).exactly(3).times.and_return('"/some_path"')
-      req = server_build_request '/?lines=3'
+      req = server_build_get_request '/?lines=3'
       server.backend_paths(req, resp)
       # Check response body is several lines of paths
       expect(resp.body.lines.count).to eq(3)
       expect(resp.body.lines[0].strip).to eq('"/some_path"')
+    end
+
+    it 'amp_report method returns metrics report' do
+      expect(test_plan).to receive(:http_port).and_return(6664)
+      body = '"82755f4b.benchmark.3sca.net","/1?user_key=86fafe7d3702f36d"'
+      expected_resp_body = { 'svc_a' => { 'm_a' => 1 } }
+      expect(metric_reporter).to receive(:report).with(body).and_return(expected_resp_body)
+      req = server_build_post_request('/report/amp', body)
+      server.amp_report(req, resp)
+      # Check returned services are expected ones
+      expect(resp.body).to be
+      parsed_response = JSON.parse(resp.body)
+      expect(parsed_response).to eq(expected_resp_body)
     end
   end
 end
