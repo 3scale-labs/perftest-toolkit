@@ -1,4 +1,6 @@
-IMAGE_TAG ?= buddhi-v1.0.0
+GIT_VERSION=$(shell git describe --tags --abbrev=0)
+VERSION=$(GIT_VERSION)
+IMAGE_TAG ?= buddhi-$(VERSION)
 IMAGE_NAME ?= perftest-toolkit:$(IMAGE_TAG)
 REGISTRY ?= quay.io/3scale
 
