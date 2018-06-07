@@ -6,4 +6,4 @@ COPY pkg/*.gem ./pkg/
 
 RUN bash -c 'gem install bundler --version 1.14.4 -N && gem install pkg/*.gem -N'
 
-ENTRYPOINT ["container-entrypoint", "amp-toolkit-buddhi"]
+ENTRYPOINT ["container-entrypoint", "perftest-toolkit-buddhi"]
