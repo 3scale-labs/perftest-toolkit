@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    perftest-toolkit-buddhi (1.0.0)
+    perftest-toolkit-buddhi (1.1.0)
       pisoni (~> 1.23.1)
       slop (~> 4.4)
 
