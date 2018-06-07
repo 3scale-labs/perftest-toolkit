@@ -1,6 +1,11 @@
+lib = File.expand_path('../lib/', __FILE__)
+$LOAD_PATH.unshift lib unless $LOAD_PATH.include?(lib)
+
+require 'amp/toolkit/buddhi/version'
+
 Gem::Specification.new do |spec|
-  spec.name          = 'amp-toolkit-buddhi'
-  spec.version       = '1.0.0'
+  spec.name          = 'perftest-toolkit-buddhi'
+  spec.version       = AMP::Toolkit::Buddhi::VERSION
   spec.authors       = ['Eguzki Astiz Lezaun']
   spec.email         = ['eastizle@redhat.com']
 

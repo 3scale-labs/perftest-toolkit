@@ -1,8 +1,12 @@
-IMAGE_TAG ?= buddhi-v1.0.0
+GIT_VERSION=$(shell git describe --tags --abbrev=0)
+VERSION=$(GIT_VERSION)
+IMAGE_TAG ?= buddhi-$(VERSION)
 IMAGE_NAME ?= perftest-toolkit:$(IMAGE_TAG)
 REGISTRY ?= quay.io/3scale
 
-build:
+.PHONY: build, push, bash, deps, test, clean
+
+build: deps
 	bundle exec rake build -v
 	docker build -t $(IMAGE_NAME) .
 
@@ -13,14 +17,13 @@ push:
 bash:
 	docker run --rm -it $(IMAGE_NAME) bash
 
-test-install:
+deps:
 	bundle install --path vendor/bundle
 
-test:
+test: deps
 	bundle exec rake spec
 
 clean:
-	bundle clean
 	rm -rf vendor
 	rm -rf pkg
 	rm -rf coverage
