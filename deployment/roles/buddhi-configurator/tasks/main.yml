@@ -6,5 +6,5 @@
     state: started
     tty: True
     network_mode: host
-    image: quay.io/3scale/perftest-toolkit:buddhi-v1.0.0
+    image: quay.io/3scale/perftest-toolkit:buddhi-latest
     command: "-p {{ buddhi_port }} -I {{ buddhi_internal_api_uri }} -B {{ buddhi_backend_uri }} -U {{ buddhi_backend_username }} -P {{ buddhi_backend_pass }} -E {{ buddhi_upstream_uri }} -T {{ buddhi_traffic_profile }} -A http://{{ buddhi_wildcard_domain }}"
