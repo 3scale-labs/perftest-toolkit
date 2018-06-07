@@ -93,7 +93,6 @@ Pretty printed
 
 ```shell
 make clean
-make test-install
 make test
 ```
 
