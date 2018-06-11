@@ -9,7 +9,7 @@ Responsibilities:
 ## Usage
 
 ```shell
-docker run --rm quay.io/3scale/perftest-toolkit:buddhi-v1.0.0 -h
+docker run --rm quay.io/3scale/perftest-toolkit:buddhi-latest -h
 usage: buddhi [options]
     -T, --testplan      load test definition key: ["saas", "onprem", "simple"]
     -I, --internal-api  backend internal api endpoint
