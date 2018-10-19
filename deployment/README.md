@@ -457,7 +457,7 @@ First, scale down *apicast-production* service to just one pod.
 Monitor pod's logs for traffic accesslog.
 
 ```bash
-oc logs -f apicast-productions-X-podId
+oc logs -f apicast-production-X-podId
 ```
 
 [Run tests](#run-tests) and check for logs.
@@ -504,7 +504,7 @@ First, scale down *apicast-production* service to just one pod.
 Monitor pod's logs for traffic accesslog.
 
 ```bash
-oc logs -f apicast-gateway-podId
+oc logs -f apicast-production-X-podId
 ```
 
 [Run tests](#run-tests) and check for logs.
@@ -563,7 +563,7 @@ File: roles/buddhi-configurator/defaults/main.yml
 buddhi_upstream_uri: "<your-api-uri>"
 ```
 
-Check *upstream* is reachable from *apicast-gateway* pods, thus, no network, DNS or routing issue is happening.
+Check *upstream* is reachable from *apicast-production* pods, thus, no network, DNS or routing issue is happening.
 
 Check *upstream* process is up and running on its host and listening on expected port (usually **8081**).
 
