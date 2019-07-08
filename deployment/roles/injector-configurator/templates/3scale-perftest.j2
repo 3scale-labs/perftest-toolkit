@@ -43,7 +43,7 @@ shift $((OPTIND -1))
 [[ -z $DURATION ]] && echo "Option not set: DURATION" 1>&2 && exit 1
 [[ -z $THREADS ]] && echo "Option not set: THREADS" 1>&2 && exit 1
 
-docker run -ti --rm --name ${CONTAINER_NAME} \
+docker run -t --rm --name ${CONTAINER_NAME} \
       -v ${REPORT_PATH}:/tmp \
       -v ${TEST_PLAN_FILE}:${JMETER_PLAN_FILE} \
       -v ${TRAFFIC_PATH}:${JMETER_TRAFFIC_PATH} \
