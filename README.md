@@ -41,7 +41,7 @@ High level overview is quite simple. Main components are represented in the diag
 * Upstream API: Also named as backend API, this is the final API service as an HTTP traffic endpoint. Optionally, for testing purposes, steps to use a fictional API named *echo-api* are also provided in this document.
 * Test Configurator (Buddhi): 3scale setup and traffic generation tool
 
-![Test setup](doc/infrastructure.png "Infrastructure")
+![Test setup](deployment/doc/infrastructure.png "Infrastructure")
 
 The steps to follow to be able to execute performance tests are:
 
