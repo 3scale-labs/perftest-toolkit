@@ -1,0 +1,19 @@
+---
+# defaults file for traffic-compiler
+
+# Maximum requests per second to send
+rps: <RPS>
+# Duration of the performance test in seconds
+duration: <DURATION>
+# Number of threads (parallel connections) to use
+threads: <THREADS>
+
+# URI that includes your password and portal endpoint in the following format: <schema>://<password>@<admin-portal-domain>.
+# The <password> can be either the provider key or an access token for the 3scale Account Management API.
+# <admin-portal-domain> is the URL used to log into the admin portal.
+# Example: https://access-token@account-admin.3scale.net
+threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
+
+# Comma separated list of services (Id's or system names)
+# If empty, all available services will be used
+services: ""
