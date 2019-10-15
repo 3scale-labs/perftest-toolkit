@@ -37,7 +37,7 @@ Generated using [github-markdown-toc](https://github.com/ekalinin/github-markdow
 High level overview is quite simple. Main components are represented in the diagram below.
 
 * Injector: Source of HTTP traffic requests
-* Openshift Container Platform with 3Scale AMP deployed
+* Openshift Container Platform with 3scale installed
 * Upstream API: Also named as backend API, this is the final API service as an HTTP traffic endpoint. Optionally, for testing purposes, steps to use a fictional API named *echo-api* are also provided in this document.
 * Test Configurator (Buddhi): 3scale setup and traffic generation tool
 
@@ -45,25 +45,21 @@ High level overview is quite simple. Main components are represented in the diag
 
 The steps to follow to be able to execute performance tests are:
 
-1. Deploy & Setup Upstream API (optional)
-1. Deploy & Setup Openshift platform
-1. Deploy & Setup 3scale on Openshift (optional)
-1. Run Test configurator
-1. Deploy & Setup Injector
-1. Run tests
+1. Deploy Upstream API (optional)
+1. Deploy Openshift platform (optional)
+1. Deploy 3scale on Openshift (optional)
+1. Deploy injector && run tests
 
 ## Deploy Upstream API
 
-If you don’t want to use your own Upstream API, the following steps show how to configure the *echo-api* Upstream test API.
+If you don’t want to use your own Upstream API, the following steps show how to deploy the *echo-api* Upstream test API.
 On 3scale, tests were carried out using an *echo-api* as backend api endpoint.
 The service will answer to http requests with response body including information from http requests.
 It is very very fast and response body tend to be very small.
 
-There is an Ansible playbook that can be used to deploy this *echo-api* upstream test API.
+**Requirements**:
 
-Requirements:
-
-Control node: 
+Control node:
 * ansible >= 2.3.1.0
 
 Managed node host:
@@ -80,12 +76,15 @@ $ git clone git@github.com:3scale/perftest-toolkit.git
 $ cd deployment
 ```
 
-* Edit the *ansible_host* parameter of the ‘upstream’ entry in the ‘hosts’ file located at the root of the repository by replacing *<host>* with the host IP address/DNS name of the machine where you want to install the *echo-api* test.
+Edit the *ansible_host* parameter of the ‘upstream’ entry in the ‘hosts’ file located at the root of the repository by replacing *<host>* with the host IP address/DNS name of the machine where you want to install the *echo-api* test.
+
 For example:
 ```
 upstream ansible_host=myupstreamhost.addr.com ansible_user=centos
 ```
-* Execute the playbook that installs and configures the *echo-api* upstream test API via Ansible.
+
+Execute the playbook that installs and configures the *echo-api* upstream test API via Ansible.
+
 ```bash
 ansible-playbook -i hosts upstream.yml
 ```
@@ -136,11 +135,11 @@ Among others:
 * Persistence deployment
 * OCP release version
 
-There is a comprehensive [installation guide for release 3.7](https://docs.openshift.com/container-platform/3.7/install_config/index.html).
+There is a comprehensive [installation guide for release 3.11](https://docs.openshift.com/container-platform/3.11/install_config/index.html).
 
-## Deploy 3Scale AMP
+## Deploy 3scale
 
-Deployment and setup of 3Scale AMP is out of scope of this document.
+Deployment and setup of 3scale is out of scope of this document.
 However it is worth noting that there are many aspects from the process that might affect performance tests results. Specifically:
 
 * Number of apicast gateway pods
@@ -148,284 +147,69 @@ However it is worth noting that there are many aspects from the process that mig
 * Number of backend listener pods
 * Number of backend listener puma workers
 * Number of backend worker pods
-* 3Scale AMP release version
+* 3scale release version
 * Redis persistence type
 
-There is a comprehensive [installation guide for AMP release 2.1](https://access.redhat.com/documentation/en-us/red_hat_3scale/2.1/html/infrastructure/onpremises-installation).
+There is a comprehensive [installation guide for 3scale release 2.6](https://access.redhat.com/documentation/en-us/red_hat_3scale_api_management/2.6/html/installing_3scale/index).
 
-### Configuration 3Scale AMP
-
-Most of the configuration coming from default AMP templates is ok for performance testing.
-Some configuration parameters (in deployment config) that were applied during testing:
-
-**apicast-production deployment config**
-```
-- name: APICAST_RESPONSE_CODES
-  value: "false"
-```
-**backend-listener deployment config**
-```
- - name: CONFIG_NOTIFICATION_BATCH
-   value: "1000000"
-```
-**backend-redis deployment config** -> Resource Limits
-```
-CPU resource limits: request: 1  limit: 2
-```
-
-### Wildcard route
-* Enable wildcard routes support
-  * Go to Openshift dashboard, go to *Default* project.
-  * Go to *Applications* -> *Deployments*. Select *router*
-  * Go to *Environment* tab, check the following wildcard configuration is set.
-```
-ROUTER_ALLOW_WILDCARD_ROUTES = true
-```
-
-Wait few seconds until routers have restarted.
-
-* Create wildcard route
-
-Currently (OCP 3.7), wildcard routes cannot be created using dashboard. CLI *oc* must be used.
-Initial *CLI* session set up is needed. Check
-[Basic Setup and Login](https://docs.openshift.com/container-platform/3.7/cli_reference/get_started_cli.html#basic-setup-and-login)
-documentation reference for more information.
-
-When *oc* is set up, fill the following template with your **<OCP_DOMAIN>**
-
-```
-apiVersion: v1
-kind: Route
-metadata:
-  name: apicast-wildcard-router-route
-spec:
-  host: subdomain.benchmark.**<OCP_DOMAIN>**
-  to:
-    kind: Service
-    name: apicast-production
-  port:
-    targetPort: gateway
-  wildcardPolicy: Subdomain
-```
-
-Save it on a file. Then, create wildcard route using *oc*:
-
-```
-# oc create -f wildcard-route.yml
-route "apicast-wildcard-router-route" created
-```
-
-When *https* is the desired traffic, this can be enabled using dashboard.
-
-  * Go to AMP project.
-  * Go to *Applications* -> *Routes*
-  * Click on *apicast-wildcard-router-route* route
-  * Go to *Actions* -> *Edit*
-
-```
-Check *Secure Route* when *https* is used
-```
-  * Push on *Save* button.
-
-## Deploy Test Configurator
-
-Test configurator (a.k.a. [**buddhi**](/buddhi)) is a service with the following responsibilities:
-
-* AMP system setup based on selected traffic profile. Call AMP internal API to provision required information for a valid traffic
-* Provide test specific configuration for AMP gateways
-* Generate traffic information for jmeter test plan
-
-Requirements:
-
-Installed packages requirements for the host:
-
-* Docker >= 1.12
-* python >= 2.6
-* docker-py >= 1.7.0
-
-Steps:
-
-* Configure Test Configurator host
-
-Set *ansible_host* attribute of *buddhi* host
-
-```
-File: hosts
-
-buddhi ansible_host=<buddhi_uri> ansible_user=centos
-```
-
-* Configure AMP backend uri
-  * Go to Openshift dashboard, go to *Applications* -> *Routes*.
-  * Get *Hostname* value of route named *backend-route*.
-  * Fill **buddhi_internal_api_uri** with that value. URI should include protocol, host and port if required.
-
-```
-File: roles/buddhi-configurator/defaults/main.yml
-
-buddhi_internal_api_uri: "<backend_uri>"
-```
-
-For example
-
-```
-buddhi_internal_api_uri: "http://backend.perftest.3sca.net"
-```
-
-* AMP backend service basic authentication
-  * Go to Openshift dashboard, go to *Applications* -> *Deployments* -> *backend-listener*
-  * Go to *Environment* tab, you will get basic authentication information from  [*CONFIG_INTERNAL_API_USER*, *CONFIG_INTERNAL_API_PASSWORD*] settings.
-```
-File: roles/buddhi-configurator/defaults/main.yml
-
-buddhi_backend_username: "<backend_username>"
-buddhi_backend_pass: "<backend_basic_auth_pass>"
-```
-
-* Configure traffic profile
-
-Used traffic for performance testing is not real traffic. It is synthetically generated traffic based on traffic models.
-Information about available traffic profiles (or test plans) can be found [here](/buddhi#usage).
-Traffic load in terms of requests per second will be specified when running tests.
-
-```
-File: roles/buddhi-configurator/defaults/main.yml
-
-buddhi_traffic_profile: [ simple | onprem | saas ]
-```
-
-*saas* profile takes half of a minute to provision all data. Let it finish before going ahead.
-
-* Configure upstream api url
-
-Private address of the upstream API that will be called by the API gateway.
-Check available [*echo-api* service deployment section](#deploy-upstream-api) if you do not want to test with your own api service.
-
-URI address should include protocol, host and port if required.
-
-```
-File: roles/buddhi-configurator/defaults/main.yml
-
-buddhi_upstream_uri: "<your-api-uri>"
-```
-
-For example
-
-```
-buddhi_upstream_uri: "http://echo-api.3scale.net"
-```
-
-* Configure wildcard domain
-
-Domain that resolves to your OCP cluster
-
-```
-File: roles/buddhi-configurator/defaults/main.yml
-
-buddhi_wildcard_domain: benchmark.<OCP_domain>
-```
-
-* Execute the playbook that installs and configures via Ansible
-
-```bash
-ansible-playbook -i hosts buddhi.yml
-```
-
-* Update *apicast gateway* setting of configuration provider
-
-Change apicast gateway deployment config
-
-  * Go to Openshift dashboard, go to *Applications* -> *Deployments* -> *apicast-production*
-  * Go to *Environment* tab, set *THREESCALE_PORTAL_ENDPOINT* environment variable to Test Configurator hostname and port in uri format. Port number can be read from file **group_vars/all.yml**, *buddhi_port* key.
-
-On deployment config change, apicast-production pods should *reboot* automatically. Otherwise, force them manually.
-
-## Deploy Injector
+## Deploy injector && run tests
 
 Injector host’s hardware resources should not be performance tests bottleneck. Enough cpu, memory and network resources should be available.
 
-Requirements:
+**Requirements**:
 
-Installed packages requirements for the host:
+Control node:
+* ansible >= 2.3.1.0
 
+Managed node host:
 * Docker >= 1.12
 * python >= 2.6
 * docker-py >= 1.7.0
 
 **Steps**:
 
-* Edit the *ansible_host* parameter of the *injector* entry by replacing **<injector_host>** with the host IP address/DNS name of the machine where you want to install the injector component. For example:
+Edit the *ansible_host* parameter of the *injector* entry by replacing **<injector_host>** with the host IP address/DNS name of the machine where you want to install the injector component. For example:
 ```
 File: hosts
 
 injector ansible_host=myinjectorhost.addr.com ansible_user=centos
 ```
 
-* Edit the **injector_jmeter_target_host** parameter replacing *<jmeter_target_host>* with the route endpoint of the AMP gateway.
+Configure 3scale portal endpoint and services
+
 ```
-File: roles/injector-configurator/defaults/main.yml
+File: roles/traffic-compiler/defaults/main.yml
 
-injector_jmeter_target_host: <jmeter_target_host>
+# URI that includes your password and portal endpoint in the following format: <schema>://<password>@<admin-portal-domain>.
+# The <password> can be either the provider key or an access token for the 3scale Account Management API.
+# <admin-portal-domain> is the URL used to log into the admin portal.
+# Example: https://access-token@account-admin.3scale.net
+threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
+
+# Comma separated list of services (Id's or system names)
+# If empty, all available services will be used
+services: ""
 ```
 
-This is just hostname, IP address or domain name. Do not include port.
+Configure performance test parameters
 
-By default, injector will perform HTTP requests to the port **80** of the target host. You can change this by editing the *injector_jmeter_protocol* (http/https) and *injector_jmeter_target_port* parameters.
+```
+File: roles/traffic-compiler/defaults/main.yml
 
-* Execute the playbook that installs and configures the injector via Ansible
+# Maximum requests per second to send
+rps: <RPS>
+# Duration of the performance test in seconds
+duration: <DURATION>
+# Number of threads (parallel connections) to use
+threads: <THREADS>
+```
+
+Execute the playbook to run tests
 ```bash
-ansible-playbook -i hosts injector.yml
+ansible-playbook -i hosts launch.yml
 ```
 
-* injector privileges
-
-So far, the injector should be already configured and available using the **/usr/local/bin/3scale-perftest** tool (see ‘Run tests’ section).
-
-This tool is running docker container behind the scenes. Thus, the user running the tool should have permission to run docker.
-If running as root is not an option, docker can be managed to run as non-root user. Follow the section
-*Manage Docker as a non-root user* of the [following guide](https://docs.docker.com/install/linux/linux-postinstall/).
-
-TL;DR
-
-```bash
-# Create the docker group.
-$ sudo groupadd docker
-
-# Add your user to the docker group.
-$ sudo usermod -aG docker $USER
-
-# Restart docker service for systemd-based OS
-$ sudo systemctl restart docker.service
-```
-
-## Run tests
-
-Requirements:
-
-* Injector already installed and configured
-* Openshift Container Platform with 3Scale AMP deployed
-* An Upstream API already installed and configured as backend of the 3Scale AMP
-* Test Configurator (Buddhi): AMP setup and traffic generation tool
-
-To perform tests the *3scale-pertest* tool is available from where the injector is installed. The usage of the 3scale-perftest tool is:
-
-```bash
-$ 3scale-perftest -h
-Usage:
-    3scale-perftest -h                       Display this help message.
-    3scale-perftest -r RPS -d DUR -t THRS    Launch 3scale perf test.
-
-Where:
--r RPS  : Maximum requests per second to send
--d DUR  : Duration of the performance test in seconds
--t THRS : Number of threads (parallel connections) to use
-```
-
-For example:
-
-```bash
-$ 3scale-perftest -r 10000 -d 600 -t 50
-```
+__TODO__
 
 The test results of the last execution are automatically stored in **/opt/3scale-perftest/reports**.
 This directory can be obtained and then the **report/index.html** can be opened to view the results.
@@ -436,53 +220,6 @@ Sometimes, even though all deployment commands run successfully, performance tra
 This might be due to a misconfiguration in any stage of the deployment process.
 When performance HTTP traffic response codes are not as expected, i.e. **200 OK**,
 there are few checks that can be very handy to find out configuration mistakes.
-
-### Check virtual host configuration and wildcard route
-
-First, scale down *apicast-production* service to just one pod.
-
-Monitor pod's logs for traffic accesslog.
-
-```bash
-oc logs -f apicast-production-X-podId
-```
-
-[Run tests](#run-tests) and check for logs.
-
-If no logs are shown, openshift routers are discarding traffic based on configured routes.
-
-* Check AMP gateway has been corretly configured. Host should be just IP address/DNS name.
-```
-File: roles/injector-configurator/defaults/main.yml
-
-injector_jmeter_target_host: <jmeter_target_host>
-```
-
-If *injector_jmeter_target_host* parameter is changed, ansible playbook has to be re-run.
-
-```
-ansible-playbook -i hosts injector.yml
-```
-
-* Check wildcard configuration.
-
-  * Go to AMP project.
-  * Go to *Applications* -> *Routes*
-
-The *apicast-wildcard-router-route* route must match with the following configuration in the deployment templates:
-
-```
-File: roles/buddhi-configurator/defaults/main.yml
-
-buddhi_wildcard_domain: benchmark.<OCP_domain>
-```
-
-If *buddhi_wildcard_domain* parameter is changed, both ansible playbooks have to be re-run.
-
-```
-ansible-playbook -i hosts buddhi.yml
-ansible-playbook -i hosts injector.yml
-```
 
 ### Check apicast gateway configuration
 
@@ -534,25 +271,12 @@ If logs are shown, check response codes on accesslog. Other than *200 OK* means
 - *redis* address is misconfigured in *backend-listener*
 - redis does not have required data to authenticate requests
 
-[Test Configurator](#deploy-test-configurator) must be deployed again. Later,
-[injector](#deploy-injector) must be deployed again as well.
-
 ### Check upstream service traffic
 
 When *backend-listener* accesslog shows requests are being answered with *200 OK* response codes,
 the last usual suspect is upstream or upstream configuration.
 
-Check *upstream* uri is correctly configured. URI should include protocol, host and port if required.
-
-```
-File: roles/buddhi-configurator/defaults/main.yml
-
-buddhi_upstream_uri: "<your-api-uri>"
-```
-
-Check *upstream* is reachable from *apicast-production* pods, thus, no network, DNS or routing issue is happening.
-
-Check *upstream* process is up and running on its host and listening on expected port (usually **8081**).
+Check *upstream* uri is correctly configured in your 3scale configuration
 
 ## Sustained load
 

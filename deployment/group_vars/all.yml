@@ -1,6 +1,4 @@
 ---
-buddhi_port: 8089
-
 shared_connections: 64
 
 ramp_up_target_users_per_sec: 8
