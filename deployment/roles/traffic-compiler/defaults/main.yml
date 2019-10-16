@@ -1,5 +1,8 @@
 ---
 # defaults file for traffic-compiler
+injector_root_path: "/opt/3scale-perftest"
+injector_traffic_path: "{{ injector_root_path }}/traffic"
+injector_traffic_file: "{{ injector_traffic_path }}/traffic.csv"
 
 # Maximum requests per second to send
 rps: <RPS>
@@ -16,4 +19,4 @@ threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
 
 # Comma separated list of services (Id's or system names)
 # If empty, all available services will be used
-services: ""
+threescale_services: ""

@@ -1,5 +1,3 @@
-require 'slop'
-
 module AMP
   module Toolkit
     module Buddhi
@@ -7,18 +5,11 @@ module AMP
         def self.cli_flags
           options = ::Slop::Options.new
           options.banner = 'usage: buddhi [options]'
-          options.string '-T', '--testplan', "load test definition key: #{Factory.generator_keys.map(&:to_s)}", required: true do |testplan|
-            unless Factory.generator_keys.include? testplan.to_sym
-              raise Slop::Error, "Expected testplans are: #{Factory.generator_keys}"
-            end
+          options.string '-P', '--portal', 'Admin portal endpoint', required: true do |portal|
+            raise Slop::Error, 'admin portal not valid' unless Factory.validate_portal portal
           end
-          options.string '-I', '--internal-api', 'backend internal epi endpoint'
-          options.string '-B', '--backend', 'backend endpoint for apicast', required: true
-          options.string '-U', '--username', 'backend internal api user', required: true
-          options.string '-P', '--password', 'backend internal api password', required: true
-          options.string '-E', '--endpoint', 'API upstream endpoint', required: true
-          options.string '-A', '--apicast', 'APIcast wildcard domain'
-          options.integer '-p', '--port', 'listen port', default: 8089
+          options.string '-s', '--services', '3scale service list', required: true
+          options.string '-o', '--output', 'output file', required: true
 
           options.on '-h', '--help' do
             help!(options)

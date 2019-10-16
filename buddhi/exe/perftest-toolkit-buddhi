@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'amp/toolkit/buddhi'
+require 'amp/toolkit'
 
 AMP::Toolkit::Buddhi.main
