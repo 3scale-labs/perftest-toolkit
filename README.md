@@ -206,7 +206,7 @@ threads: <THREADS>
 
 Execute the playbook to run tests
 ```bash
-ansible-playbook -i hosts launch.yml
+ansible-playbook -i hosts injector.yml
 ```
 
 __TODO__

@@ -1,28 +1,17 @@
 PATH
   remote: .
   specs:
-    perftest-toolkit-buddhi (1.1.0)
-      pisoni (~> 1.23.1)
+    perftest-toolkit-buddhi (2.0.0)
+      3scale-api (~> 0.6.0)
       slop (~> 4.4)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    connection_pool (2.2.2)
+    3scale-api (0.6.0)
     diff-lcs (1.3)
     docile (1.3.1)
-    faraday (0.15.2)
-      multipart-post (>= 1.2, < 3)
-    injectedlogger (0.0.13)
     json (1.8.6)
-    multipart-post (2.0.0)
-    net-http-persistent (3.0.0)
-      connection_pool (~> 2.2)
-    pisoni (1.23.2)
-      faraday (>= 0.9.1)
-      injectedlogger (>= 0.0.13)
-      json (>= 1.8.1)
-      net-http-persistent
     rake (10.5.0)
     rspec (3.7.0)
       rspec-core (~> 3.7.0)
@@ -44,7 +33,7 @@ GEM
       json (>= 1.8, < 3)
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.2)
-    slop (4.6.2)
+    slop (4.7.0)
 
 PLATFORMS
   ruby
