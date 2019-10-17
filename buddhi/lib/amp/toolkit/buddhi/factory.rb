@@ -28,7 +28,7 @@ module AMP
           ThreeScale.client(portal_url).list_accounts
           true
         rescue StandardError => e
-          puts e
+          warn "\e[1m\e[31m#{e.class}: #{e.message}\e[0m"
           false
         end
       end
