@@ -14,7 +14,7 @@ jobs:
 
     docker:
       # specify the version you desire here
-      - image: circleci/ruby:2.3-node-browsers
+      - image: circleci/ruby:2.5-node-browsers
 
     working_directory: ~/app/buddhi
 

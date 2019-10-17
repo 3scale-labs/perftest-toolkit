@@ -23,6 +23,9 @@ bash:
 deps:
 	bundle install --path vendor/bundle
 
+test: deps
+	bundle exec rake spec
+
 clean:
 	rm -rf vendor
 	rm -rf pkg
