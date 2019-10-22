@@ -13,7 +13,7 @@ plugin: 3scale_inventory_plugin
 - hosts: 
   - hyperfoil_agent
   roles:
-  - hyperfoil.hyperfoil_test
+  - injector
   vars:
     test_name: 3scale-benchmark
 - hosts:
