@@ -1,37 +1,7 @@
 ---
-  - name: Creates traffic directory
-    file:
-      path: "{{ injector_traffic_path }}"
-      state: directory
-  - name: Creates test plan directory
-    file:
-      path: "{{ injector_plans_path }}"
-      state: directory
-  - name: Creates report directory
-    file:
-      path: "{{ injector_reports_path }}"
-      state: directory
-  - name: Creates bin directory
-    file:
-      path: "{{ injector_bin_path }}"
-      state: directory
-  - name: Download traffic urls from buddhi
-    get_url:
-      url: "http://{{ hostvars['buddhi'].ansible_host }}:{{ buddhi_port }}/paths/amp?lines={{ injector_traffic_num_lines }}"
-      force: yes
-      dest: "{{ injector_traffic_path }}/csv_traffic_profile.csv"
-      mode: 0440
-  - name: Deploy jmeter test plan
-    copy:
-      src: test-plan-csv.jmx
-      dest: "{{ injector_plan_file }}"
-  - name: Deploy perftest script
-    template:
-      src: 3scale-perftest.j2
-      dest: "{{ injector_bin_path }}/3scale-perftest"
-      mode: 0755
-  - name: Create symbolic link
-    file:
-      src: "{{ injector_bin_path }}/3scale-perftest"
-      dest: "/usr/local/bin/3scale-perftest"
-      state: link
+- name: Install Galaxy setup role for Hyperfoil
+  shell: ansible-galaxy install hyperfoil.hyperfoil_setup,0.3
+- name: Install Galaxy shutdown role for Hyperfoil
+  shell: ansible-galaxy install hyperfoil.hyperfoil_shutdown,0.3
+- name: Install Galaxy install role for Hyperfoil
+  shell: ansible-galaxy install hyperfoil.hyperfoil_test,0.3

@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
-  remote_user: root
+- hosts:
+  - hyperfoil_controller
+  - hyperfoil_agent
   roles:
     - injector-configurator

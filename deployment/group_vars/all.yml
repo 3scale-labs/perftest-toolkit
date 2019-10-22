@@ -1,2 +1,14 @@
 ---
 buddhi_port: 8089
+
+ramp_up_target_users_per_sec: 8
+ramp_up_duration_sec: 60
+
+csv_file_path: benchmark/3scale.csv
+
+steady_state_users: 8
+steady_state_duration: 60
+
+ramp_down_users: 8
+ramp_down_duration: 60
+  

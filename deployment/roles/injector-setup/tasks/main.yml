@@ -1,0 +1,16 @@
+---
+tasks:
+  - name: Set the hyperfoil controller host variable
+    set_fact:
+      hyperfoil_controller_host: "{{ groups.hyperfoil_controller[0] }}"
+  - name: Check Controller status
+    uri:
+      url: "http://{{ hyperfoil_controller_host }}:{{ hyperfoil_controller_port }}/"
+    register: hfc_status
+    ignore_errors: True
+  - name: Check status code
+    debug: var=hfc_status.status
+  - name: Start Controller
+    when: hfc_status.status == -1
+    include_role:
+      - hyperfoil.hyperfoil_setup

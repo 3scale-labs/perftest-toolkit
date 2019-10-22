@@ -1,5 +1,29 @@
----
-- hosts: injector
-  become: yes
+plugin: 3scale_inventory_plugin
+
+- hosts:
+  - hyperfoil_controller
+  - hyperfoil_agent
+  tasks:
+  - include_role:
+      name: injector-configurator
+- hosts:
+  - hyperfoil_controller
   roles:
-    - injector-configurator
+  - injector_setup
+- hosts: 
+  - hyperfoil_agent
+  roles:
+  - hyperfoil.hyperfoil_test
+  vars:
+    test_name: 3scale-benchmark
+- hosts:
+  - hyperfoil_controller
+  roles:
+  - hyperfoil.hyperfoil_shutdown
+- hosts:
+  - hyperfoil_controller
+  tasks:
+  - name: Debug the RunID fact
+    debug: var=test_runid
+  - name: Process the run to generate a report
+    shell: "{{ JDK_11_FOLDER }}/bin/java -jar {{ REPORT_HOME }}/target/{{ REPORTER_JAR }} -s /tmp/hyperfoil/workspace/run/{{ test_runid }} -d /tmp/hyperfoil/workspace/run/{{ test_runid }}/index.html"

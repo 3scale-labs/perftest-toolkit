@@ -1,0 +1,3 @@
+---
+injector_target_port:80
+shared_connections:64
