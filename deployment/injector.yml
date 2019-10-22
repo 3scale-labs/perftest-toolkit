@@ -25,5 +25,5 @@ plugin: 3scale_inventory_plugin
   tasks:
   - name: Debug the RunID fact
     debug: var=test_runid
-  - name: Process the run to generate a report
-    shell: "{{ JDK_11_FOLDER }}/bin/java -jar {{ REPORT_HOME }}/target/{{ REPORTER_JAR }} -s /tmp/hyperfoil/workspace/run/{{ test_runid }} -d /tmp/hyperfoil/workspace/run/{{ test_runid }}/index.html"
+#  - name: Process the run to generate a report
+#    shell: "{{ JDK_11_FOLDER }}/bin/java -jar {{ REPORT_HOME }}/target/{{ REPORTER_JAR }} -s /tmp/hyperfoil/workspace/run/{{ test_runid }} -d /tmp/hyperfoil/workspace/run/{{ test_runid }}/index.html"
