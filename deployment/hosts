@@ -1,3 +1,9 @@
 buddhi ansible_host=<buddhi-host> ansible_user=<buddhi-user>
-injector ansible_host=<injector-host> ansible_user=<injector-user>
 upstream ansible_host=<upstream-host> ansible_user=<upstream-user>
+
+[hyperfoil_controller]
+<injector-controller-host> ansible_hostname=<injector-controller-host> ansible_host=<injector-controller-host>
+
+[hyperfoil_agent]
+<injector-agent-host-01> ansible_host=<injector-agent-host-01> ansible_hostname=<injector-agent-host-01>
+#<injector-agent-host-02> ansible_host=<injector-agent-host-02> ansible_hostname=<injector-agent-host-02>
