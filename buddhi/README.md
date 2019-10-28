@@ -17,7 +17,9 @@ $ cat traffic.csv
 ```shell
 docker run --rm quay.io/3scale/perftest-toolkit:buddhi-v2-latest -h
 usage: buddhi [options]
-__TODO__
+    -P, --portal    Admin portal endpoint
+    -s, --services  3scale service list
+    -o, --output    output file
     -h, --help
 ```
 
