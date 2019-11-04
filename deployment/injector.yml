@@ -1,22 +1,38 @@
-plugin: 3scale_inventory_plugin
-
 - hosts:
   - hyperfoil_controller
   - hyperfoil_agent
   tasks:
   - include_role:
       name: injector-configurator
-- hosts:
-  - hyperfoil_controller
-  roles:
-  - injector_setup
-- hosts: 
-  - hyperfoil_agent
-  roles:
-  - hyperfoil.hyperfoil_test
+- hosts: hyperfoil_agent
+  tasks:
+  - include_role:
+      name: hyperfoil.hyperfoil_setup
   vars:
-    test_name: 3scale-benchmark
+    hyperfoil_role: agent
 - hosts:
-  - hyperfoil_controller
-  roles:
-  - hyperfoil.hyperfoil_shutdown
+    - hyperfoil_controller
+    - hyperfoil_agent
+  tasks:
+    - name: Assign path variable
+      set_fact:
+        csv_dest_file_path: "/tmp/{{ csv_file_name }}"
+    - name: Distribute CSV inventory source file
+      copy:
+        src: "{{ csv_file_path }}/{{ csv_file_name }}"
+        dest: "{{ csv_dest_file_path }}"
+        force: yes
+- hosts: hyperfoil_controller
+  tasks:
+  - include_role:
+      name: injector-setup
+- hosts: hyperfoil_controller
+  tasks: 
+  - include_role:
+      name: hyperfoil.hyperfoil_test
+    vars:
+      test_name: 3scale-benchmark
+#- hosts: hyperfoil_controller
+#  tasks:
+#  - include_role:
+#      name: hyperfoil.hyperfoil_shutdown

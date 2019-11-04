@@ -1,14 +1,24 @@
 ---
 buddhi_port: 8089
 
+shared_connections: 64
+
 ramp_up_target_users_per_sec: 8
 ramp_up_duration_sec: 60
 
-csv_file_path: benchmark/3scale.csv
+csv_file_path: benchmarks
+csv_file_name: 3scale.csv
 
 steady_state_users: 8
 steady_state_duration: 60
 
 ramp_down_users: 8
 ramp_down_duration: 60
-  
+
+hyperfoil_agent_group: hyperfoil_agent
+hyperfoil_agent_port: 22
+
+injector_target_group: injector_target
+injector_target_port: 80
+
+hyperfoil_controller_group: hyperfoil_controller

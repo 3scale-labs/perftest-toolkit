@@ -47,7 +47,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
       for line in data_file:
          hostsset.add(line.split(',')[0].lstrip('"').rstrip('"'))
 
-      self.inventory.add_group('injector_target_hosts')
+      self.inventory.add_group('injector_target')
       for host in hostsset:
-         self.inventory.add_host(host, 'injector_target_hosts')
+         self.inventory.add_host(host, 'injector_target')
          self.inventory.set_variable(host, 'ansible_host', host)
