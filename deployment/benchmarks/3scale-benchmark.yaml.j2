@@ -4,10 +4,10 @@ agents:
   {{ agent }}: {{ hostvars[agent]['ansible_host'] }}:{{ hyperfoil_agent_port }}
 {% endfor %}
 http:
-{% for target_host in groups[injector_target_hosts] %}
-- host: http://{% target_host %}:{{ injector_target_port }}
+{% for host in groups[injector_target_group] %}
+- host: http://{{ host }}:{{ injector_target_port }}
   sharedConnections: {{ shared_connections }}
-{% endfor %}  
+{% endfor %}
 phases:
 - rampUp:
     rampPerSec:
@@ -18,9 +18,9 @@ phases:
         initialSequences:
         - testSequence:
           - randomCsvRow:
-             file: {{ playbook_dir }}/{{ csv_file_path }}
-             skipComments: true
-             removeQuotes: true
+             file: {{ csv_dest_file_path }}
+             skipComments: 'True'
+             removeQuotes: 'True'
              columns:
                0: target-host
                1: uri
