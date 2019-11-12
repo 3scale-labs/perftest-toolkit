@@ -1,0 +1,4 @@
+#	$OpenBSD: ssh_config,v 1.33 2017/05/07 23:12:57 djm Exp $
+Host 192.168.42.*
+   StrictHostKeyChecking no
+   UserKnownHostsFile=/dev/null

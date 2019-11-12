@@ -1,0 +1,95 @@
+# Vertx cluster
+# virtual machines need starting in sequence.
+# vagrant up --no-parallel
+
+VAGRANTFILE_API_VERSION = "2"
+VM_BOX = "fedora/30-cloud-base"
+VM_BOX_VERSION = "30.20190425.0"
+VM_PACKAGES = "java-1.8.0-openjdk.x86_64 openssl apr libxcrypt-compat ansible expect unzip"
+VM_AGENTS_SCRIPT = "sudo dnf install -y " + VM_PACKAGES + ";sudo dnf update --security -y"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.ssh.insert_key = false
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.manage_guest = true
+  config.hostmanager.ignore_private_ip = false
+  config.hostmanager.include_offline = true
+
+  # install from cache on host directory
+  Dir.mkdir('.dnf-cache') unless File.exists?('.dnf-cache')
+  config.vm.synced_folder ".dnf-cache", "/var/cache/dnf", type: "sshfs"
+
+  # injector target host 1. aa20ba69-a86e-4294-981b-41cd258aff47
+  config.vm.define "apitarget01" do |inventory|
+    inventory.vm.hostname = "aa20ba69-a86e-4294-981b-41cd258aff47.benchmark"
+    inventory.vm.box = VM_BOX
+    inventory.vm.box_version = VM_BOX_VERSION
+    inventory.vm.network :private_network, ip: "192.168.42.41"
+    inventory.vm.provision "bootstrap", type: "shell" do |s|
+      s.inline = "sudo dnf install -y java-1.8.0-openjdk-devel.x86_64;sudo dnf update --security -y;mkdir -p /tmp/vertx-cache;chown -R vagrant:vagrant /tmp/vertx-cache;sudo su - vagrant --command=\"git clone https://github.com/whitingjr/echo-api.git\;cd echo-api;./gradlew assemble;java -jar build/libs/echo-api-1.0-SNAPSHOT-fat.jar start org.jboss.echoapi.EchoService\""
+    end
+  end
+
+  # injector target host 2. d09c5600-c546-4012-b81a-49b0eadaea1a
+  config.vm.define "apitarget02" do |inventory|
+    inventory.vm.hostname = "d09c5600-c546-4012-b81a-49b0eadaea1a.benchmark"
+    inventory.vm.box = VM_BOX
+    inventory.vm.box_version = VM_BOX_VERSION
+    inventory.vm.network :private_network, ip: "192.168.42.42"
+    inventory.vm.provision "bootstrap", type: "shell" do |s|
+      s.inline = "sudo dnf install -y java-1.8.0-openjdk-devel.x86_64;sudo dnf update --security -y;mkdir -p /tmp/vertx-cache;chown -R vagrant:vagrant /tmp/vertx-cache;sudo su - vagrant --command=\"git clone https://github.com/whitingjr/echo-api.git\;cd echo-api;./gradlew assemble;java -jar build/libs/echo-api-1.0-SNAPSHOT-fat.jar start org.jboss.echoapi.EchoService\""
+    end 
+  end
+
+  # injector target host 3. 73642bdb-78ef-4054-aa2f-9a880f09dd39
+  config.vm.define "apitarget03" do |inventory|
+    inventory.vm.hostname = "73642bdb-78ef-4054-aa2f-9a880f09dd39.benchmark"
+    inventory.vm.box = VM_BOX
+    inventory.vm.box_version = VM_BOX_VERSION
+    inventory.vm.network :private_network, ip: "192.168.42.43"
+    inventory.vm.provision "bootstrap", type: "shell" do |s|
+      s.inline = "sudo dnf install -y java-1.8.0-openjdk-devel.x86_64;sudo dnf update --security -y;mkdir -p /tmp/vertx-cache;chown -R vagrant:vagrant /tmp/vertx-cache;sudo su - vagrant --command=\"git clone https://github.com/whitingjr/echo-api.git\;cd echo-api;./gradlew assemble;java -jar build/libs/echo-api-1.0-SNAPSHOT-fat.jar start org.jboss.echoapi.EchoService\""
+    end
+  end
+
+    config.vm.define "injector-agent-01" do |inventory|
+    inventory.vm.hostname = "injector-agent-01"
+    inventory.vm.box = VM_BOX
+    inventory.vm.box_version = VM_BOX_VERSION
+    inventory.vm.network :private_network, ip: "192.168.42.46"
+    inventory.vm.provision "bootstrap", type: "shell" do |s|
+      s.inline = VM_AGENTS_SCRIPT
+    end
+  end
+
+  config.vm.define "injector-agent-02" do |inventory|
+    inventory.vm.hostname = "injector-agent-02"
+    inventory.vm.box = VM_BOX
+    inventory.vm.box_version = VM_BOX_VERSION
+    inventory.vm.network :private_network, ip: "192.168.42.47"
+    inventory.vm.provision "bootstrap", type: "shell" do |s|
+      s.inline = VM_AGENTS_SCRIPT
+    end
+  end
+
+  config.vm.define "injector-controller" do |inventory|
+    inventory.vm.hostname = "injector-controller"
+    inventory.vm.box = VM_BOX
+    inventory.vm.box_version = VM_BOX_VERSION
+    inventory.vm.network :private_network, ip: "192.168.42.45"
+    inventory.vm.provision "bootstrap", type: "shell" do |s|
+      s.inline = VM_AGENTS_SCRIPT + ";sudo su - vagrant --command=\"ssh-keygen -f ~/.ssh/id_rsa -N '';cp /vagrant/config /home/vagrant/.ssh/config;chmod 644 /home/vagrant/.ssh/config;chmod +x /vagrant/push-ssh-key.sh;/vagrant/push-ssh-key.sh vagrant@injector-agent-01;/vagrant/push-ssh-key.sh vagrant@injector-agent-02;/vagrant/push-ssh-key.sh vagrant@injector-controller;git clone https://github.com/3scale/perftest-toolkit.git --branch hyperfoil\" "
+      end
+  end
+
+  config.vm.synced_folder ".", "/vagrant", owner: "vagrant",
+     group: "vagrant", mount_options: ["uid=1234", "gid=1234"]
+
+  config.vm.provider "libvirt" do |lv|
+    lv.memory=756
+    lv.qemu_use_session = false
+    lv.management_network_address = "192.168.121.0/24"
+  end
+end
+   

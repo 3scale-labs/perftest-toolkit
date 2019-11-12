@@ -1,0 +1,6 @@
+[hyperfoil_controller]
+192.168.42.45 ansible_host=192.168.42.45 ansible_hostname=192.168.42.45 
+
+[hyperfoil_agent]
+192.168.42.46 ansible_host=192.168.42.46 ansible_hostname=192.168.42.46
+#192.168.42.47 ansible_host=192.168.42.47 ansible_hostname=192.168.42.47

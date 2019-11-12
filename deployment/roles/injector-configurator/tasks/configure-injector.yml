@@ -1,7 +1,7 @@
 ---
 - name: Install Galaxy setup role for Hyperfoil
-  shell: ansible-galaxy install hyperfoil.hyperfoil_setup,0.3
+  shell: ansible-galaxy install hyperfoil.hyperfoil_setup,0.4
 - name: Install Galaxy shutdown role for Hyperfoil
-  shell: ansible-galaxy install hyperfoil.hyperfoil_shutdown,0.3
+  shell: ansible-galaxy install hyperfoil.hyperfoil_shutdown,0.4
 - name: Install Galaxy install role for Hyperfoil
-  shell: ansible-galaxy install hyperfoil.hyperfoil_test,0.3
+  shell: ansible-galaxy install hyperfoil.hyperfoil_test,0.4

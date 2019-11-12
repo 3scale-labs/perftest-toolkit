@@ -1,16 +1,10 @@
 - hosts:
-  - hyperfoil_controller
-  - hyperfoil_agent
+    - hyperfoil_controller
+    - hyperfoil_agent
   tasks:
   - include_role:
-      name: injector-configurator
-- hosts: hyperfoil_agent
-  tasks:
-  - include_role:
-      name: hyperfoil.hyperfoil_setup
-  vars:
-    hyperfoil_role: agent
-- hosts:
+    name: injector-configurator
+- hosts: 
     - hyperfoil_controller
     - hyperfoil_agent
   tasks:
