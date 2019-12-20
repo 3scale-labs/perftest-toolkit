@@ -1,3 +1,2 @@
-buddhi ansible_host=<buddhi-host> ansible_user=<buddhi-user>
-injector ansible_host=<injector-host> ansible_user=<injector-user>
+injector ansible_host=<injector_host> ansible_user=<injector-user>
 upstream ansible_host=<upstream-host> ansible_user=<upstream-user>

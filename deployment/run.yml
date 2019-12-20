@@ -1,0 +1,13 @@
+---
+- hosts: injector
+  become: yes
+  tasks:
+    - name: run performace test
+      shell: /usr/local/bin/3scale-perftest -r <RPS> -d <DURATION> -t <THREADS>
+      register: out
+    - debug: var=out.stdout_lines
+    - name: Fetch results
+      fetch: 
+        src: /opt/3scale-perftest/reports
+        dest: .
+

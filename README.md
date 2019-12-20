@@ -14,13 +14,9 @@ The goal is to help to resolve doubts or issues related to scalability or perfor
 ## Table of Contents
 
 * [High level overview](#high-level-overview)
-* [Deployment of provisioning tool](#deployment-of-provisioning-tool)
-* [Deploy Upstream API](#deploy-upstream-api)
-* [Deploy Openshift platform](#deploy-openshift-platform)
-* [Deploy 3Scale AMP](#deploy-3scale-amp)
-  * [Configuration 3Scale AMP](#configuration-3scale-amp)
-  * [Wildcard route](#wildcard-route)
-* [Deploy Test Configurator](#deploy-test-configurator)
+* [Deploy Upstream API (Optional)](#deploy-upstream-api)
+* [Deploy Openshift platform (Optional)](#deploy-openshift-platform)
+* [Deploy 3scale (Optional)](#deploy-3scale)
 * [Deploy Injector](#deploy-injector)
 * [Run tests](#run-tests)
 * [Troubleshooting](#troubleshooting)
@@ -152,7 +148,7 @@ However it is worth noting that there are many aspects from the process that mig
 
 There is a comprehensive [installation guide for 3scale release 2.6](https://access.redhat.com/documentation/en-us/red_hat_3scale_api_management/2.6/html/installing_3scale/index).
 
-## Deploy injector && run tests
+## Deploy injector
 
 Injector host’s hardware resources should not be performance tests bottleneck. Enough cpu, memory and network resources should be available.
 
@@ -168,7 +164,7 @@ Managed node host:
 
 **Steps**:
 
-Edit the *ansible_host* parameter of the *injector* entry by replacing **<injector_host>** with the host IP address/DNS name of the machine where you want to install the injector component. For example:
+Edit the *ansible_host* parameter by replacing **<injector_host>** with the host IP address/DNS name of the host where you want to install the injector component. For example:
 ```
 File: hosts
 
@@ -178,7 +174,7 @@ injector ansible_host=myinjectorhost.addr.com ansible_user=centos
 Configure 3scale portal endpoint and services
 
 ```
-File: roles/traffic-compiler/defaults/main.yml
+File: roles/injector-configuratior/defaults/main.yml
 
 # URI that includes your password and portal endpoint in the following format: <schema>://<password>@<admin-portal-domain>.
 # The <password> can be either the provider key or an access token for the 3scale Account Management API.
@@ -188,30 +184,33 @@ threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
 
 # Comma separated list of services (Id's or system names)
 # If empty, all available services will be used
-services: ""
+threescale_services: ""
 ```
+Execute the playbook to deploy injector.
 
-Configure performance test parameters
-
-```
-File: roles/traffic-compiler/defaults/main.yml
-
-# Maximum requests per second to send
-rps: <RPS>
-# Duration of the performance test in seconds
-duration: <DURATION>
-# Number of threads (parallel connections) to use
-threads: <THREADS>
-```
-
-Execute the playbook to run tests
 ```bash
 ansible-playbook -i hosts injector.yml
 ```
 
-__TODO__
+## Run tests
 
-The test results of the last execution are automatically stored in **/opt/3scale-perftest/reports**.
+Configure performance parameters:
+
+```
+File: run.yml
+
+<RPS>: Maximum requests per second to send
+<DURATION>: Duration of the performance test in seconds
+<THREADS>: Number of threads (parallel connections) to use
+```
+
+Run tests
+
+```bash
+ansible-playbook -i hosts run.yml
+```
+
+The test results of the last execution are automatically stored in **$PWD/reports**.
 This directory can be obtained and then the **report/index.html** can be opened to view the results.
 
 ## Troubleshooting

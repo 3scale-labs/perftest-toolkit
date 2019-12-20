@@ -7,7 +7,6 @@ JMETER_PLAN_FILE={{ injector_jmeter_plan_file }}
 TRAFFIC_PATH={{ injector_traffic_path }}
 JMETER_TRAFFIC_PATH={{ injector_jmeter_traffic_path }}
 PROTOCOL={{ injector_jmeter_protocol }}
-TARGET_HOST={{ injector_jmeter_target_host }}
 TARGET_PORT={{ injector_jmeter_target_port }}
 
 while getopts ":hr:d:t:" opt; do
@@ -50,7 +49,6 @@ docker run -t --rm --name ${CONTAINER_NAME} \
       --net=host --privileged=true \
       -e PROTOCOL="${PROTOCOL}" \
       -e DURATION="${DURATION}" \
-      -e TARGET="${TARGET_HOST}" \
       -e TARGET_PORT="${TARGET_PORT}" \
       -e THREADS="${THREADS}" \
       -e RPS="${RPS}" \
