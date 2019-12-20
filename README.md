@@ -210,8 +210,8 @@ Run tests
 ansible-playbook -i hosts run.yml
 ```
 
-The test results of the last execution are automatically stored in **$PWD/reports**.
-This directory can be obtained and then the **report/index.html** can be opened to view the results.
+The test results of the last execution are automatically stored in **/opt/3scale-perftest/reports**.
+This directory can be fetched and then the **report/index.html** can be opened to view the results.
 
 ## Troubleshooting
 
