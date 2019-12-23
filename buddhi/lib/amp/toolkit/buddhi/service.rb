@@ -12,11 +12,24 @@ module AMP
         def items
           return [] if service_host.nil?
 
+          # When multiple applications exist, each mapping rule will be authorized by a random app
+          # For services with app_id && app_key (backend_version 2)
+          #   When multiple applications key exist,
+          #   each mapping rule will be authorized by a random app key
           get_mapping_rules = mapping_rules.select { |mr| mr.fetch('http_method') == 'GET' }
-          get_mapping_rules.map { |mr| [service_host, cleaned_pattern(mr.fetch('pattern'))] }
+          url_ary = get_mapping_rules.map(&method(:build_url)) 
+          url_ary.map { |u| [u.host, u.request_uri] }
         end
 
         private
+
+        def build_url(mapping_rule)
+          URI::HTTP.build(
+            host: service_host,
+            path: cleaned_pattern(mapping_rule.fetch('pattern')),
+            query: application_key_sample
+          )
+        end
 
         def cleaned_pattern(pattern)
           pattern.chomp('$')
@@ -24,6 +37,10 @@ module AMP
 
         def mapping_rules
           client.list_mapping_rules service_id
+        end
+
+        def applications
+          @applications ||= fetch_service_applications
         end
 
         def service_host
@@ -39,6 +56,36 @@ module AMP
 
           endpoint = ThreeScale::Helper.parse_uri(endpoint_url)
           endpoint.host
+        end
+
+        def fetch_service_applications
+          client.list_applications(service_id: service_id)
+        end
+
+        def application_key_sample
+          return nil if applications.empty?
+
+          URI.encode_www_form(app_auth_params(applications.sample))
+        end
+
+        def app_auth_params(app)
+          if app['application_id'].nil?
+            {
+              user_key: app['user_key']
+            }
+          else
+            {
+              app_id: app['application_id'],
+              app_key: application_key(app)
+            }
+          end
+        end
+
+        def application_key(app)
+          application_keys = client.list_application_keys(app['account_id'], app['id'])
+          return nil if application_keys.empty?
+
+          application_keys.sample['value']
         end
       end
     end

@@ -11,6 +11,9 @@ module AMP
               end
             end
           end
+        rescue StandardError => e
+          warn "\e[1m\e[31m#{e.class}: #{e.message}\e[0m"
+          exit(false)
         end
 
         def self.service_ary(client, services)
