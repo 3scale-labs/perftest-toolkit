@@ -97,15 +97,4 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 =end
-  RSpec::Matchers.define :max_num_usage_limit do |max|
-    match do |actual|
-      actual.key?(:n_usage_limits) && actual[:n_usage_limits] <= max
-    end
-  end
-
-  require 'simplecov'
-  SimpleCov.start
 end
-
-# Require spec helpers
-Dir[File.dirname(__FILE__) + '/spec_helpers/**/*.rb'].each { |file| require file }
