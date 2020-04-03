@@ -1,3 +1,5 @@
+require 'amp/toolkit/buddhi/helper'
+require 'amp/toolkit/buddhi/profiles'
 require 'amp/toolkit/buddhi/service'
 require 'amp/toolkit/buddhi/factory'
 require 'amp/toolkit/buddhi/cli'
