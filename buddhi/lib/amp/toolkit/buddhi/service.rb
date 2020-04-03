@@ -17,7 +17,7 @@ module AMP
           #   When multiple applications key exist,
           #   each mapping rule will be authorized by a random app key
           get_mapping_rules = mapping_rules.select { |mr| mr.fetch('http_method') == 'GET' }
-          url_ary = get_mapping_rules.map(&method(:build_url)) 
+          url_ary = get_mapping_rules.map(&method(:build_url))
           url_ary.map { |u| [u.host, u.request_uri] }
         end
 
@@ -36,7 +36,26 @@ module AMP
         end
 
         def mapping_rules
+          mapping_rule_list = product_mapping_rules + backend_mapping_rules
+        end
+
+        def product_mapping_rules
           client.list_mapping_rules service_id
+        end
+
+        def backend_mapping_rules
+          backend_usages.flat_map do |backend_usage|
+            client.list_backend_mapping_rules(backend_usage.fetch('backend_id')).map do |mp_rule|
+              mp_rule.merge('pattern' => "#{backend_usage.fetch('path')}#{mp_rule['pattern']}")
+            end
+          end
+        end
+
+        def backend_usages
+          client.list_backend_usages(service_id)
+        rescue ::ThreeScale::API::HttpClient::ForbiddenError
+          # 3scale Backends not supported
+          []
         end
 
         def applications
