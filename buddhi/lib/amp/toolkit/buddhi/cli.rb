@@ -2,7 +2,6 @@ module AMP
   module Toolkit
     module Buddhi
       class CLI
-        VALID_PROFILES = %w[simple backend]
         def self.cli_flags
           options = ::Slop::Options.new
           options.banner = 'usage: buddhi [options]'
