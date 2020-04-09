@@ -1,2 +1,3 @@
-require 'amp/toolkit/buddhi/profiles/profile_register'
+require 'amp/toolkit/buddhi/profiles/register'
 require 'amp/toolkit/buddhi/profiles/simple'
+require 'amp/toolkit/buddhi/profiles/backend'

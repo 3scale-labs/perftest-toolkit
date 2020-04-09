@@ -198,6 +198,49 @@ module AMP
           res
         end
 
+        def self.backend_hits_metric(client, backend)
+          metrics = client.list_backend_metrics backend.fetch('id')
+          if metrics.respond_to?(:has_key?) && (errors = metrics['errors'])
+            raise "Backend metrics not read: #{errors}"
+          end
+
+          hits_metric_obj = metrics.find { |metric| metric['system_name'].include? 'hits' }
+          raise "Missing hits metric in backend #{backend.fetch('id')}" if hits_metric_obj.nil?
+
+          hits_metric_obj
+        end
+
+        def self.create_backend_mapping_rule(client, backend, method, path)
+          mapping_rule_params = {
+            'metric_id' => method.fetch('id'), 'pattern' => path,
+            'http_method' => 'GET',
+            'delta' => 1
+          }
+
+          mapping_rule_obj = client.create_backend_mapping_rule backend.fetch('id'), mapping_rule_params
+          if (errors = mapping_rule_obj['errors'])
+            raise "Backend MappingRule has not been created: #{errors}"
+          end
+
+          mapping_rule_obj
+        end
+
+        def self.create_backend_method(client, backend)
+          hits_metric_obj = backend_hits_metric(client, backend)
+          attrs = {
+            'system_name' => random_lowercase_name,
+            'friendly_name' => random_lowercase_name,
+            'description' => random_lowercase_name
+          }
+          method_obj = client.create_backend_method(backend.fetch('id'), hits_metric_obj.fetch('id'), attrs)
+
+          if (errors = method_obj['errors'])
+            raise "Method has not been created: #{errors}"
+          end
+
+          method_obj
+        end
+
         # wait tries a block of code until it returns true, or the timeout is reached.
         # timeout give an upper limit to the amount of time this method will run
         # Some intervals may be missed if the block takes too long or the time window is too short.
