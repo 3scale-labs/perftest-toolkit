@@ -1,6 +1,5 @@
 ---
 # tasks file for injector-configurator
 
-- include: traffic-configurator.yml
 - include: build-image.yml
 - include: configure-injector.yml

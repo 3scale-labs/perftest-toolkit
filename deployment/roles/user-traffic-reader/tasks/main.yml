@@ -1,4 +1,5 @@
 ---
+# tasks file for user-traffic-reader
 - name: Creates tmp traffic directory
   tempfile:
     state: directory
@@ -16,7 +17,7 @@
     user: root
     tty: True
     detach: no
-    image: quay.io/3scale/perftest-toolkit:buddhi-v2-latest
+    image: quay.io/3scale/perftest-toolkit:master
     command: "--portal {{ threescale_portal_endpoint }} --services \"{{ threescale_services }}\" -o /traffic/traffic.csv"
     volumes:
       - "{{ tempdir_1.path }}:/traffic"

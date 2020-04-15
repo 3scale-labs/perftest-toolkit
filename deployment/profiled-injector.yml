@@ -2,5 +2,5 @@
 - hosts: injector
   become: yes
   roles:
-    - user-traffic-reader
+    - profiled-traffic-generator
     - injector-configurator
