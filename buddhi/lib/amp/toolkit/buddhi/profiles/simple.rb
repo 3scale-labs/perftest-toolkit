@@ -11,8 +11,13 @@ module AMP
             ThreeScale::Helper.create_mapping_rule(client, service, '/pets')
             account = ThreeScale::Helper.account(client)
             ThreeScale::Helper.create_application(client, plan, account)
-            backend = ThreeScale::Helper.create_backend(client, endpoint)
-            ThreeScale::Helper.create_backend_usage(client, service, backend, '/')
+            begin
+              backend = ThreeScale::Helper.create_backend(client, endpoint)
+              ThreeScale::Helper.create_backend_usage(client, service, backend, '/')
+            rescue ::ThreeScale::API::HttpClient::ForbiddenError
+              # 3scale Backends not supported
+              ThreeScale::Helper.update_private_endpoint(client, service, endpoint)
+            end
             ThreeScale::Helper.bump_proxy_conf(client, service)
             ThreeScale::Helper.promote_proxy_conf(client, service)
             return service.fetch('id')

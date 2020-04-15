@@ -241,6 +241,17 @@ module AMP
           method_obj
         end
 
+        def self.update_private_endpoint(client, service, endpoint)
+          proxy = { api_backend: endpoint }
+          new_proxy_attrs = client.update_proxy service.fetch('id'), proxy
+
+          if (errors = new_proxy_attrs['errors'])
+            raise "Service proxy not updated: #{errors}"
+          end
+
+          new_proxy_attrs
+        end
+
         # wait tries a block of code until it returns true, or the timeout is reached.
         # timeout give an upper limit to the amount of time this method will run
         # Some intervals may be missed if the block takes too long or the time window is too short.

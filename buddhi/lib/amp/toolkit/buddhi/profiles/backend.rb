@@ -10,10 +10,15 @@ module AMP
             ThreeScale::Helper.create_application(client, plan, account)
             ThreeScale::Helper.create_application_plan_limit(client, service, plan)
             ThreeScale::Helper.delete_mapping_rules(client, service)
-            backend = ThreeScale::Helper.create_backend(client, endpoint)
-            backend_method = ThreeScale::Helper.create_backend_method(client, backend)
-            ThreeScale::Helper.create_backend_mapping_rule(client, backend, backend_method, '/pets')
-            ThreeScale::Helper.create_backend_usage(client, service, backend, '/')
+            begin
+              backend = ThreeScale::Helper.create_backend(client, endpoint)
+              backend_method = ThreeScale::Helper.create_backend_method(client, backend)
+              ThreeScale::Helper.create_backend_mapping_rule(client, backend, backend_method, '/pets')
+              ThreeScale::Helper.create_backend_usage(client, service, backend, '/')
+            rescue ::ThreeScale::API::HttpClient::ForbiddenError
+              raise 'Provider account does not support backend profile. ' \
+                      'Upgrade account to API as Product model or choose another profile.'
+            end
             ThreeScale::Helper.bump_proxy_conf(client, service)
             ThreeScale::Helper.promote_proxy_conf(client, service)
             return service.fetch('id')
