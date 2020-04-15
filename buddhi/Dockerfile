@@ -1,9 +1,16 @@
-FROM centos/ruby-25-centos7
+FROM centos/ruby-25-centos7:latest
+MAINTAINER Eguzki Astiz Lezaun <eastizle@redhat.com>
 
-ENV BUNDLE_WITHOUT=development:test
+USER root
+WORKDIR /opt/app-root/src
+COPY . .
+RUN /bin/bash -l -c "gem build perftest-toolkit-buddhi.gemspec"
+RUN /bin/bash -l -c "gem install perftest-toolkit-buddhi-*.gem --no-document"
 
-COPY pkg/*.gem ./pkg/
+# clean up
+RUN rm -rf /opt/app-root/src/*
 
-RUN bash -c 'gem install bundler -N && gem install pkg/*.gem -N'
+# Drop privileges
+USER default
 
 ENTRYPOINT ["container-entrypoint", "perftest-toolkit-buddhi"]

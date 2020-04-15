@@ -7,8 +7,7 @@ REGISTRY ?= quay.io/3scale
 
 .PHONY: build, push, bash, deps, test, clean
 
-build: deps
-	bundle exec rake build -v
+build:
 	docker build -t $(IMAGE_NAME) .
 
 push:

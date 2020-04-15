@@ -14,9 +14,13 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/3scale/perftest-toolkit'
   spec.license       = 'Apache-2.0'
 
-  spec.files = `git ls-files -z 2>/dev/null`.split("\x0").reject do |f|
-    f.match(%r{^(test|spec|features)/})
-  end
+  spec.files         = Dir['{lib}/**/*.rb']
+  spec.files         += Dir['{exe,resources}/*']
+  spec.files         << 'README.md'
+  # There is a bug in gem 2.7.6 and __FILE__ cannot be used.
+  # It is expanded in rake release task with full path on the building host
+  spec.files         << 'perftest-toolkit-buddhi.gemspec'
+
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
