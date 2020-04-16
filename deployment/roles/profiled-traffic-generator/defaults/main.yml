@@ -1,0 +1,19 @@
+---
+# defaults file for profiled-traffic-generator
+
+# URI that includes your password and portal endpoint in the following format: <schema>://<password>@<admin-portal-domain>.
+# The <password> can be either the provider key or an access token for the 3scale Account Management API.
+# <admin-portal-domain> is the URL used to log into the admin portal.
+# Example: https://access-token@account-admin.3scale.net
+threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
+
+# Used traffic for performance testing is not real traffic.
+# It is synthetically generated traffic based on traffic models.
+# Information about available traffic profiles (or test plans) can be found here:
+# TODO add link
+# Currently available profiles: [ simple | backend ]
+traffic_profile: <TRAFFIC_PROFILE>
+
+# Private Base URL
+# example: https://echo-api.3scale.net:443
+private_base_url: <PRIVATE_BASE_URL>

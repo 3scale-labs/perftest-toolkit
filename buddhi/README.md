@@ -2,7 +2,7 @@
 
 Responsibilities:
 
-* Generate CSV formatted file with **Host, Path*^** header.
+* Generate CSV formatted file with **Host, Path** columns.
 ```bash
 $ cat traffic.csv
 "53f07c14-e35e-4bfa-b0b1-9d3a993fad14.benchmark.3sca.net","/1?app_id=ddfa9a8842a3822e&app_key=73418183a69b027a"
@@ -15,22 +15,41 @@ $ cat traffic.csv
 ## Usage
 
 ```shell
-docker run --rm quay.io/3scale/perftest-toolkit:buddhi-v2-latest -h
+docker run --rm quay.io/3scale/perftest-toolkit:master -h
 usage: buddhi [options]
     -P, --portal    Admin portal endpoint
     -s, --services  3scale service list
+    -e, --endpoint  API upstream endpoint
+    -p, --profile   3scale product profile. Valid profiles ["simple", "backend"]
     -o, --output    output file
     -h, --help
+    -v, --version   print the version
 ```
+
+`--services` and `--profile` are mutually exclusive options.
+
+* If `--services` is provided, the tool will inspect those services and generate traffic tool from them.
+* If `--profile` is provided, the tool will create a 3scale product with the given profile. Currently valid profiles are `simple, backend`. `--profile` option requires `--endpoint` option to be provided.
+
+### Profiles
+
+* The **simple** profile defines:
+  * One product
+    * One mapping rule (for hits metric)
+    * One application plan
+    * One application plan limit (big enough to not be reached)
+    * One application
+  * One backend 
+* The **backend** profile defines: 
+  * One product
+    * One application plan
+    * One application plan limit (big enough to not be reached)
+    * One application
+  * One backend 
+    * One method
+    * One mapping rule (for the previous method)
 
 ## Development
-
-## Run unit tests
-
-```shell
-make clean
-make test
-```
 
 ## Build docker image
 

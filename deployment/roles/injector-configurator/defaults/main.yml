@@ -1,11 +1,9 @@
 ---
 # defaults file for injector-configurator
 #
-injector_root_path: "/opt/3scale-perftest"
 injector_bin_path: "{{ injector_root_path }}/bin"
 injector_reports_path: "{{ injector_root_path }}/reports"
 injector_plans_path: "{{ injector_root_path }}/test-plans"
-injector_traffic_path: "{{ injector_root_path }}/traffic"
 injector_plan_file: "{{ injector_plans_path }}/test-plan.jmx"
 
 injector_jmeter_plan_path: "/opt/apache-jmeter-5.2"
@@ -20,13 +18,3 @@ injector_jmeter_image_tag: "1.0"
 
 injector_jmeter_protocol: http
 injector_jmeter_target_port: 80
-
-# URI that includes your password and portal endpoint in the following format: <schema>://<password>@<admin-portal-domain>.
-# The <password> can be either the provider key or an access token for the 3scale Account Management API.
-# <admin-portal-domain> is the URL used to log into the admin portal.
-# Example: https://access-token@account-admin.3scale.net
-threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
-
-# Comma separated list of services (Id's or system names)
-# If empty, all available services will be used
-threescale_services: ""

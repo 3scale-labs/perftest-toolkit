@@ -29,7 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.5'
   spec.add_development_dependency 'rspec-collection_matchers'
-  spec.add_development_dependency 'simplecov'
-  spec.add_dependency '3scale-api', '~> 0.6.0'
+  spec.add_dependency '3scale-api', '~> 1.0.0'
   spec.add_dependency 'slop', '~> 4.4'
 end
