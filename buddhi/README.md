@@ -2,7 +2,7 @@
 
 Responsibilities:
 
-* Generate CSV formatted file with **Host, Path*^** header.
+* Generate CSV formatted file with **Host, Path** columns.
 ```bash
 $ cat traffic.csv
 "53f07c14-e35e-4bfa-b0b1-9d3a993fad14.benchmark.3sca.net","/1?app_id=ddfa9a8842a3822e&app_key=73418183a69b027a"
@@ -33,8 +33,21 @@ usage: buddhi [options]
 
 ### Profiles
 
-* The **simple** profile defines one product, one backend and one mapping rule (for hits metric) at product level.
-* The **backend** profile defines one product, one backend, one backend method and one backend mapping rule for that method.
+* The **simple** profile defines:
+  * One product
+    * One mapping rule (for hits metric)
+    * One application plan
+    * One application plan limit (big enough to not be reached)
+    * One application
+  * One backend 
+* The **backend** profile defines: 
+  * One product
+    * One application plan
+    * One application plan limit (big enough to not be reached)
+    * One application
+  * One backend 
+    * One method
+    * One mapping rule (for the previous method)
 
 ## Development
 

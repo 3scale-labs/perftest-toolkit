@@ -31,14 +31,18 @@ High level overview is quite simple. Main components are represented in the diag
 
 * Injector: Source of HTTP traffic requests
 * Openshift Container Platform with 3scale installed
-* Upstream API: Also named as backend API, this is the final API service as an HTTP traffic endpoint. Optionally, for testing purposes, [deploy Upstream API](doc/deploy-upstream-api.md).
+* Upstream API: Also named as backend API, this is the final API service as an HTTP traffic endpoint. Optionally, for testing purposes, [deploy Upstream API](deployment/doc/deploy-upstream-api.md).
 * Test Configurator (Buddhi): 3scale setup and traffic generation tool
 
 ![Test setup](deployment/doc/infrastructure.png "Infrastructure")
 
 ## Deploy injector
 
-Injector host’s hardware resources should not be performance tests bottleneck. Enough cpu, memory and network resources should be available.
+There are **two** ways of running your tests and the injector has to be configured accordingly.
+
+* [Test your own 3scale services](#test-your-3scale-services): The injector will be configured to use your 3scale products (a.k.a. services).
+
+* [Setup traffic profiles](#setup-traffic-profiles): Configure your performance tests to use synthetically generated traffic based on traffic models.
 
 **Requirements**:
 
@@ -50,28 +54,20 @@ Managed node host:
 * python >= 2.6
 * docker-py >= 1.7.0
 
-There are **two** ways of running your tests and the injector has to be configured accordingly.
-
-* Test your own 3scale services
-
-The injector will be configured to use your 3scale products (a.k.a. services).
-
-* Setup traffic profiles
-
-Configure your performance tests to use synthetically generated traffic based on traffic models.
+Make sure that the injector host’s hardware resources is not the performance tests bottleneck. Enough cpu, memory and network resources should be available.
 
 ### Test your 3scale services
 
 **Steps**:
 
-Edit the *ansible_host* parameter by replacing **<injector_host>** with the host IP address/DNS name of the host where you want to install the injector component. For example:
+**1.** Edit the *ansible_host* parameter by replacing **<injector_host>** with the host IP address/DNS name of the host where you want to install the injector component. For example:
 ```
 File: hosts
 
 injector ansible_host=myinjectorhost.addr.com ansible_user=centos
 ```
 
-Configure the following settings in `roles/user-traffic-reader/defaults/main.yml` file:
+**2.** Configure the following settings in `roles/user-traffic-reader/defaults/main.yml` file:
 * `threescale_portal_endpoint`: 3scale portal endpoint 
 * `threescale_services`: Select the 3scale services you want to use for the tests. Leave it empty to use them all.
 
@@ -89,7 +85,7 @@ threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
 threescale_services: ""
 ```
 
-Execute the playbook `injector.yml` to deploy injector.
+**3.** Execute the playbook `injector.yml` to deploy injector.
 
 ```bash
 ansible-playbook -i hosts injector.yml
@@ -99,17 +95,17 @@ ansible-playbook -i hosts injector.yml
 
 **Steps**:
 
-Edit the *ansible_host* parameter by replacing **<injector_host>** with the host IP address/DNS name of the host where you want to install the injector component. For example:
+**1.** Edit the *ansible_host* parameter by replacing **<injector_host>** with the host IP address/DNS name of the host where you want to install the injector component. For example:
 ```
 File: hosts
 
 injector ansible_host=myinjectorhost.addr.com ansible_user=centos
 ```
 
-Configure the following settings in `roles/profiled-traffic-generator/defaults/main.yml` file:
+**2.** Configure the following settings in `roles/profiled-traffic-generator/defaults/main.yml` file:
 * `threescale_portal_endpoint`: 3scale portal endpoint 
 * `traffic_profile`: Currently available profiles: `simple, backend`
-* `private_base_url`: Private Base URL used for the tests
+* `private_base_url`: Private Base URL used for the tests. Make sure your private application behaves like an echo api service.
 
 ```
 File: roles/profiled-traffic-generator/defaults/main.yml
@@ -123,17 +119,17 @@ threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
 # Used traffic for performance testing is not real traffic.
 # It is synthetically generated traffic based on traffic models.
 # Information about available traffic profiles (or test plans) can be found here:
-# TODO add link
+# https://github.com/3scale/perftest-toolkit/blob/master/buddhi/README.md#profiles
 # Currently available profiles: [ simple | backend ]
 traffic_profile: <TRAFFIC_PROFILE>
 
 # Private Base URL
+# Make sure your private application behaves like an echo api service
 # example: https://echo-api.3scale.net:443
 private_base_url: <PRIVATE_BASE_URL>
-
 ```
 
-Execute the playbook `profiled-injector.yml` to deploy injector.
+**3.** Execute the playbook `profiled-injector.yml` to deploy injector.
 
 ```bash
 ansible-playbook -i hosts profiled-injector.yml
@@ -141,7 +137,7 @@ ansible-playbook -i hosts profiled-injector.yml
 
 ## Run tests
 
-Configure performance parameters:
+**1.** Configure performance parameters:
 
 ```
 File: run.yml
@@ -151,7 +147,7 @@ File: run.yml
 <THREADS>: Number of threads (parallel connections) to use
 ```
 
-Run tests
+**2.** Run tests
 
 ```bash
 ansible-playbook -i hosts run.yml
