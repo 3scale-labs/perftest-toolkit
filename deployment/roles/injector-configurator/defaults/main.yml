@@ -10,11 +10,9 @@ injector_jmeter_plan_path: "/opt/apache-jmeter-5.2"
 injector_jmeter_plan_file: "{{ injector_jmeter_plan_path }}/test-plan.jmx"
 injector_jmeter_traffic_path: "{{ injector_jmeter_plan_path}}/data"
 
-injector_traffic_num_lines: 100000
-
 injector_jmeter_image_contents_path: "{{ injector_root_path }}/jmeter-image-contents"
 injector_jmeter_image_name: "jmeter-benchmark"
 injector_jmeter_image_tag: "1.0"
 
-injector_jmeter_protocol: http
-injector_jmeter_target_port: 80
+injector_jmeter_protocol: https
+injector_jmeter_target_port: 443
