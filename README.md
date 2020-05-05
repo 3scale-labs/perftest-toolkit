@@ -14,6 +14,7 @@ The goal is to help to resolve doubts or issues related to scalability or perfor
 
 * [High level overview](#high-level-overview)
 * [Deploy injector](#deploy-injector)
+   * [Common settings](#common-settings)
    * [Test your 3scale services](#test-your-3scale-services)
    * [Setup traffic profiles](#setup-traffic-profiles)
 * [Run tests](#run-tests)
@@ -29,7 +30,7 @@ Generated using [github-markdown-toc](https://github.com/ekalinin/github-markdow
 
 High level overview is quite simple. Main components are represented in the diagram below.
 
-* Injector: Source of HTTP traffic requests
+* Injector: Source of HTTP/HTTPS traffic requests
 * Openshift Container Platform with 3scale installed
 * Upstream API: Also named as backend API, this is the final API service as an HTTP traffic endpoint. Optionally, for testing purposes, [deploy Upstream API](deployment/doc/deploy-upstream-api.md).
 * Test Configurator (Buddhi): 3scale setup and traffic generation tool
@@ -56,6 +57,20 @@ Managed node host:
 
 Make sure that the injector host’s hardware resources is not the performance tests bottleneck. Enough cpu, memory and network resources should be available.
 
+### Common settings
+
+** HTTP/HTTPS **
+
+By default, the injector will generate HTTPS traffic on the port number 443.
+You can change this setting editing *injector_jmeter_protocol* and *injector_jmeter_target_port* parameters.
+
+```
+File: roles/injector-configurator/defaults/main.yml
+
+injector_jmeter_protocol: https
+injector_jmeter_target_port: 443
+```
+
 ### Test your 3scale services
 
 **Steps**:
@@ -68,7 +83,7 @@ injector ansible_host=myinjectorhost.addr.com ansible_user=centos
 ```
 
 **2.** Configure the following settings in `roles/user-traffic-reader/defaults/main.yml` file:
-* `threescale_portal_endpoint`: 3scale portal endpoint 
+* `threescale_portal_endpoint`: 3scale portal endpoint
 * `threescale_services`: Select the 3scale services you want to use for the tests. Leave it empty to use them all.
 
 ```
@@ -103,7 +118,7 @@ injector ansible_host=myinjectorhost.addr.com ansible_user=centos
 ```
 
 **2.** Configure the following settings in `roles/profiled-traffic-generator/defaults/main.yml` file:
-* `threescale_portal_endpoint`: 3scale portal endpoint 
+* `threescale_portal_endpoint`: 3scale portal endpoint
 * `traffic_profile`: Currently available profiles: `simple, backend`
 * `private_base_url`: Private Base URL used for the tests. Make sure your private application behaves like an echo api service.
 
