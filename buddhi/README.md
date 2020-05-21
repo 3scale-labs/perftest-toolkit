@@ -20,7 +20,7 @@ usage: buddhi [options]
     -P, --portal    Admin portal endpoint
     -s, --services  3scale service list
     -e, --endpoint  API upstream endpoint
-    -p, --profile   3scale product profile. Valid profiles ["simple", "backend"]
+    -p, --profile   3scale product profile. Valid profiles ["simple", "backend", "standard"]
     -o, --output    output file
     -h, --help
     -v, --version   print the version
@@ -29,7 +29,7 @@ usage: buddhi [options]
 `--services` and `--profile` are mutually exclusive options.
 
 * If `--services` is provided, the tool will inspect those services and generate traffic tool from them.
-* If `--profile` is provided, the tool will create a 3scale product with the given profile. Currently valid profiles are `simple, backend`. `--profile` option requires `--endpoint` option to be provided.
+* If `--profile` is provided, the tool will create a 3scale product with the given profile. Currently valid profiles are `simple, backend, standard`. `--profile` option requires `--endpoint` option to be provided.
 
 ### Profiles
 
@@ -48,6 +48,17 @@ usage: buddhi [options]
   * One backend 
     * One method
     * One mapping rule (for the previous method)
+* The **standard** profile defines: 
+  * 1 Account
+    * 10000 Applications
+  * 100 products
+    * 1 application plan per product
+    * 10 application plan limits per product
+    * 100 application per plan
+    * 10 backend usages per product
+  * 1000 backend (each product will be using 10 backends)
+    * 50 methods
+    * 50 mapping rules
 
 ## Development
 

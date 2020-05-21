@@ -119,7 +119,7 @@ injector ansible_host=myinjectorhost.addr.com ansible_user=centos
 
 **2.** Configure the following settings in `roles/profiled-traffic-generator/defaults/main.yml` file:
 * `threescale_portal_endpoint`: 3scale portal endpoint
-* `traffic_profile`: Currently available profiles: `simple, backend`
+* `traffic_profile`: Currently [available profiles](buddy/README.md#profiles): `simple, backend, standard`
 * `private_base_url`: Private Base URL used for the tests. Make sure your private application behaves like an echo api service.
 
 ```
@@ -135,7 +135,7 @@ threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
 # It is synthetically generated traffic based on traffic models.
 # Information about available traffic profiles (or test plans) can be found here:
 # https://github.com/3scale/perftest-toolkit/blob/master/buddhi/README.md#profiles
-# Currently available profiles: [ simple | backend ]
+# Currently available profiles: [ simple | backend | standard ]
 traffic_profile: <TRAFFIC_PROFILE>
 
 # Private Base URL
