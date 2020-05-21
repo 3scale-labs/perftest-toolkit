@@ -46,7 +46,7 @@ module AMP
         def backend_mapping_rules
           backend_usages.flat_map do |backend_usage|
             client.list_backend_mapping_rules(backend_usage.fetch('backend_id')).map do |mp_rule|
-              mp_rule.merge('pattern' => "#{backend_usage.fetch('path')}#{mp_rule['pattern']}")
+              mp_rule.merge('pattern' => "#{backend_usage.fetch('path').chomp('/')}#{mp_rule['pattern']}")
             end
           end
         end

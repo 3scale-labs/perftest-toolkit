@@ -6,6 +6,7 @@ require 'time'
 require 'csv'
 require 'net/http'
 require 'pathname'
+require 'concurrent'
 require '3scale/api'
 
 require 'amp/toolkit/3scale'

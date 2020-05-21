@@ -18,7 +18,8 @@ module AMP
         # # 0 Method per backend
         # # 0 MappingRule per backend
         class Simple
-          def call(client, endpoint:, **_options)
+          def self.call(portal, endpoint)
+            client = ThreeScale.client(portal)
             service = ThreeScale::Helper.create_service(client)
             plan = ThreeScale::Helper.create_application_plan(client, service)
             hits_metric_obj = ThreeScale::Helper.hits_metric(client, service)
@@ -39,7 +40,8 @@ module AMP
             return [service.fetch('id')]
           end
         end
-        Register.register_profile(:simple, Simple.new)
+
+        Register.register_profile(:simple) { |portal, endpoint| Simple.call(portal, endpoint) }
       end
     end
   end

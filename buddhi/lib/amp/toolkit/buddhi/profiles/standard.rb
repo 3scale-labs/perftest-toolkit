@@ -22,17 +22,40 @@ module AMP
           METHODS_PER_BACKEND_N = 50
           LIMITS_PER_PRODUCT = 10
 
-          def call(client, endpoint:, **_options)
+          def self.call(portal, endpoint)
+            client = ThreeScale.client(portal)
             account = ThreeScale::Helper.create_account(client)
+            services = Concurrent::Array.new
 
-            Array.new(SERVICES_N) do
-              service = ThreeScale::Helper.create_service(client)
-              configure_service(client, endpoint, service, account)
-              service.fetch('id')
+            # threads array
+            threads = Array.new(SERVICES_N) do
+              Thread.new(account, endpoint, services) do |acc, endp, s_list|
+                standard = Standard.new(portal, endp, acc)
+                standard.run
+                s_list << standard.service_id
+              end
             end
+
+            # run all threads
+            threads.each(&:join)
+
+            services
           end
 
-          def configure_service(client, endpoint, service, account)
+          attr_reader :client, :account, :service, :endpoint
+
+          def initialize(portal, endpoint, account)
+            @client = ThreeScale.client(portal)
+            @endpoint = endpoint
+            @service = ThreeScale::Helper.create_service(client)
+            @account = account
+          end
+
+          def service_id
+            service.fetch('id')
+          end
+
+          def run
             ThreeScale::Helper.delete_mapping_rules(client, service)
             plan = ThreeScale::Helper.create_application_plan(client, service)
 
@@ -50,7 +73,6 @@ module AMP
                       'Upgrade account to API as Product model or choose another profile.'
             end
 
-            
             method_iter = backends.lazy.flat_map do |backend|
               ThreeScale::Helper.backend_methods(client, backend)
             end
@@ -77,7 +99,7 @@ module AMP
           end
         end
 
-        Register.register_profile(:standard, Standard.new)
+        Register.register_profile(:standard) { |portal, endpoint| Standard.call(portal, endpoint) }
       end
     end
   end
