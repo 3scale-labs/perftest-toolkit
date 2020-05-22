@@ -56,15 +56,11 @@ module AMP
           hits_metric_obj
         end
 
-        def self.create_application_plan_limit(client, service, plan)
-          hits_metric_obj = hits_metric(client, service)
-
+        def self.create_application_plan_limit(client, service, plan, metric_id)
           # Very high limit: 4294967295 / 3600 => 1.2 M req/second during one hour to go over limit
           limit_params = { 'period' => 'hour', 'value' => 2**32 - 1 }
           limit_obj = client.create_application_plan_limit(
-            plan.fetch('id'),
-            hits_metric_obj.fetch('id'),
-            limit_params
+            plan.fetch('id'), metric_id, limit_params
           )
           if (errors = limit_obj['errors'])
             raise "Limit has not been created: #{errors}"
@@ -123,6 +119,16 @@ module AMP
           raise 'No accounts available' if accounts.length.zero?
 
           accounts[0]
+        end
+
+        def self.create_account(client)
+          account_name = "account_#{random_lowercase_name}"
+          account_obj = client.signup(name: account_name, username: account_name)
+          if account_obj.respond_to?(:has_key?) && (errors = account_obj['errors'])
+            raise "Account not created: #{errors}"
+          end
+
+          account_obj
         end
 
         def self.create_backend(client, endpoint)
@@ -267,6 +273,25 @@ module AMP
           end
 
           raise "timed out after #{timeout} seconds"
+        end
+
+        def self.backends(client)
+          b_list = client.list_backends
+          if b_list.respond_to?(:has_key?) && (errors = b_list['errors'])
+            raise "Backend list not read: #{errors}"
+          end
+
+          b_list
+        end
+
+        def self.backend_methods(client, backend)
+          hits_metric_obj = backend_hits_metric(client, backend)
+          m_list = client.list_backend_methods(backend.fetch('id'), hits_metric_obj.fetch('id'))
+          if m_list.respond_to?(:has_key?) && (errors = m_list['errors'])
+            raise "Backend list not read: #{errors}"
+          end
+
+          m_list
         end
       end
     end

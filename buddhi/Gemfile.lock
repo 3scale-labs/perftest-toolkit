@@ -3,12 +3,14 @@ PATH
   specs:
     perftest-toolkit-buddhi (2.0.0)
       3scale-api (~> 1.0.0)
+      concurrent-ruby (~> 1.1)
       slop (~> 4.4)
 
 GEM
   remote: https://rubygems.org/
   specs:
     3scale-api (1.0.0)
+    concurrent-ruby (1.1.6)
     diff-lcs (1.3)
     rake (13.0.1)
     rspec (3.7.0)
@@ -39,4 +41,4 @@ DEPENDENCIES
   rspec-collection_matchers
 
 BUNDLED WITH
-   1.16.1
+   1.17.3
