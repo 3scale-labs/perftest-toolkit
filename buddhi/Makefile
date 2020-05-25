@@ -1,8 +1,6 @@
-GIT_VERSION=$(shell git describe --tags --abbrev=0)
-VERSION=$(GIT_VERSION)
-IMAGE_TAG ?= buddhi-$(VERSION)
+IMAGE_TAG ?= master
 IMAGE_NAME ?= perftest-toolkit:$(IMAGE_TAG)
-LATEST_IMAGE ?= perftest-toolkit:buddhi-v2-latest
+LATEST_IMAGE ?= perftest-toolkit:latest
 REGISTRY ?= quay.io/3scale
 
 .PHONY: build, push, bash, deps, test, clean
