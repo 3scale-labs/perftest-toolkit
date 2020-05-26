@@ -10,10 +10,11 @@ threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
 # Used traffic for performance testing is not real traffic.
 # It is synthetically generated traffic based on traffic models.
 # Information about available traffic profiles (or test plans) can be found here:
-# TODO add link
-# Currently available profiles: [ simple | backend ]
+# https://github.com/3scale/perftest-toolkit/blob/master/buddhi/README.md#profiles
+# Currently available profiles: [ simple | backend | standard ]
 traffic_profile: <TRAFFIC_PROFILE>
 
 # Private Base URL
+# Make sure your private application behaves like an echo api service
 # example: https://echo-api.3scale.net:443
 private_base_url: <PRIVATE_BASE_URL>
