@@ -21,18 +21,22 @@ module AMP
           BACKEND_PER_SVC_N = 10
           METHODS_PER_BACKEND_N = 50
           LIMITS_PER_PRODUCT = 10
+          THREADS_N = 10
 
           def self.call(portal, endpoint)
             client = ThreeScale.client(portal)
             account = ThreeScale::Helper.create_account(client)
             services = Concurrent::Array.new
+            service_tasks = [*1..SERVICES_N]
 
             # threads array
-            threads = Array.new(SERVICES_N) do
-              Thread.new(account, endpoint, services) do |acc, endp, s_list|
-                standard = Standard.new(portal, endp, acc)
-                standard.run
-                s_list << standard.service_id
+            threads = service_tasks.each_slice(THREADS_N).map do |tasks|
+              Thread.new(account, endpoint, services, tasks) do |acc, endp, s_list, s_tasks|
+                s_tasks.each do
+                  standard = Standard.new(portal, endp, acc)
+                  standard.run
+                  s_list << standard.service_id
+                end
               end
             end
 
