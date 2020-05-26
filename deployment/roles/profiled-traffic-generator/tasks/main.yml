@@ -17,7 +17,7 @@
     user: root
     tty: True
     detach: no
-    image: quay.io/3scale/perftest-toolkit:master
+    image: quay.io/3scale/perftest-toolkit:v2-latest
     command: "--portal {{ threescale_portal_endpoint }} --profile \"{{ traffic_profile }}\" --endpoint \"{{ private_base_url }}\" -o /traffic/traffic.csv"
     volumes:
       - "{{ tempdir_1.path }}:/traffic"
