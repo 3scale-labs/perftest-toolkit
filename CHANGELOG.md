@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.0] - 2020-05-26
+
+### Added
+
+- Added Simple and Backend profile [PR #36](https://github.com/3scale/perftest-toolkit/pull/36)
+- Added Standard profile [PR #40](https://github.com/3scale/perftest-toolkit/pull/40)
+
 ## [2.0.0] - 2020-04-03
 
 ### Added
