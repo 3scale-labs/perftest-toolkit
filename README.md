@@ -134,7 +134,7 @@ threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
 # Used traffic for performance testing is not real traffic.
 # It is synthetically generated traffic based on traffic models.
 # Information about available traffic profiles (or test plans) can be found here:
-# https://github.com/3scale/perftest-toolkit/blob/master/buddhi/README.md#profiles
+# https://github.com/3scale/perftest-toolkit/tree/v2-stable/buddhi/README.md#profiles
 # Currently available profiles: [ simple | backend | standard ]
 traffic_profile: <TRAFFIC_PROFILE>
 
