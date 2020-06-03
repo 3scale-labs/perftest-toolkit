@@ -27,12 +27,15 @@ module AMP
             client = ThreeScale.client(portal)
             account = ThreeScale::Helper.create_account(client)
             services = Concurrent::Array.new
-            service_tasks = [*1..SERVICES_N]
+            # array with the number of services for each thread
+            thread_tasks = [SERVICES_N/THREADS_N]*THREADS_N
+            # Remaining shared between threads
+            thread_tasks[0, SERVICES_N%THREADS_N] = thread_tasks[0, SERVICES_N%THREADS_N].map { |x| x + 1 }
 
             # threads array
-            threads = service_tasks.each_slice(THREADS_N).map do |tasks|
-              Thread.new(account, endpoint, services, tasks) do |acc, endp, s_list, s_tasks|
-                s_tasks.each do
+            threads = thread_tasks.map do |n_tasks|
+              Thread.new(account, endpoint, services, n_tasks) do |acc, endp, s_list, n|
+                n.times do
                   standard = Standard.new(portal, endp, acc)
                   standard.run
                   s_list << standard.service_id
