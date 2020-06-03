@@ -21,7 +21,7 @@ module AMP
           BACKEND_PER_SVC_N = 10
           METHODS_PER_BACKEND_N = 50
           LIMITS_PER_PRODUCT = 10
-          THREADS_N = 10
+          THREADS_N = Integer(ENV.fetch("THREADS_N", "10"))
 
           def self.call(portal, endpoint)
             client = ThreeScale.client(portal)
