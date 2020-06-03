@@ -1,4 +1,4 @@
-IMAGE_TAG ?= v2.1.0
+IMAGE_TAG ?= v2.2.0
 IMAGE_NAME ?= perftest-toolkit:$(IMAGE_TAG)
 LATEST_IMAGE ?= perftest-toolkit:v2-latest
 REGISTRY ?= quay.io/3scale
