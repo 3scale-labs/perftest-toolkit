@@ -31,7 +31,7 @@ module AMP
             begin
               backend = ThreeScale::Helper.create_backend(client, endpoint)
               ThreeScale::Helper.create_backend_usage(client, service, backend, '/')
-            rescue ::ThreeScale::API::HttpClient::ForbiddenError
+            rescue ::ThreeScale::API::HttpClient::ForbiddenError, ::ThreeScale::API::HttpClient::NotFoundError
               # 3scale Backends not supported
               ThreeScale::Helper.update_private_endpoint(client, service, endpoint)
             end

@@ -53,7 +53,7 @@ module AMP
 
         def backend_usages
           client.list_backend_usages(service_id)
-        rescue ::ThreeScale::API::HttpClient::ForbiddenError
+        rescue ::ThreeScale::API::HttpClient::ForbiddenError, ::ThreeScale::API::HttpClient::NotFoundError
           # 3scale Backends not supported
           []
         end
