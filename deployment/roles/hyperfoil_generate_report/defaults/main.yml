@@ -1,0 +1,3 @@
+---
+# defaults file for hyperfoil_generate_report
+hyperfoil_controller_port: 8090

@@ -5,11 +5,6 @@
     state: directory
   register: tempdir_1
 
-- name: Creates traffic directory
-  file:
-    path: "{{ injector_traffic_path }}"
-    state: directory
-
 - name: Run Buddhi to create traffic file
   docker_container:
     name: buddhi
@@ -25,7 +20,7 @@
 - name: Copy traffic file
   copy:
     src: "{{ tempdir_1.path }}/traffic.csv"
-    dest: "{{ injector_traffic_path }}/csv_traffic_profile.csv"
+    dest: "{{csv_file_path}}/{{csv_file_name}}"
     remote_src: true
 
 - name: Remove the temporary file

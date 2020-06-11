@@ -41,7 +41,7 @@ High level overview is quite simple. Main components are represented in the diag
 
 There are **two** ways of running your tests and the injector has to be configured accordingly.
 
-* [Test your own 3scale services](#test-your-3scale-services): The injector will be configured to use your 3scale products (a.k.a. services).
+* [Test your own 3scale services](#test-your-3scale-services): The injector will be custom configured to use your 3scale products (a.k.a. services).
 
 * [Setup traffic profiles](#setup-traffic-profiles): Configure your performance tests to use synthetically generated traffic based on traffic models.
 
@@ -54,32 +54,35 @@ Managed node host:
 * Docker >= 1.12
 * python >= 2.6
 * docker-py >= 1.7.0
+* Java => 8
 
 Make sure that the injector host’s hardware resources is not the performance tests bottleneck. Enough cpu, memory and network resources should be available.
 
-### Common settings
+*Installation Step*:
 
-** HTTP/HTTPS **
+Install the injector Ansible Galaxy roles on the Ansible Control node:
 
-By default, the injector will generate HTTPS traffic on the port number 443.
-You can change this setting editing *injector_jmeter_protocol* and *injector_jmeter_target_port* parameters.
-
+```bash
+ansible-galaxy install hyperfoil.hyperfoil_setup,0.8
+ansible-galaxy install hyperfoil.hyperfoil_shutdown,0.8
+ansible-galaxy install hyperfoil.hyperfoil_test,0.8
+ansible-galaxy install hyperfoil.hyperfoil_generate_report,0.0.1
 ```
-File: roles/injector-configurator/defaults/main.yml
-
-injector_jmeter_protocol: https
-injector_jmeter_target_port: 443
-```
-
-### Test your 3scale services
 
 **Steps**:
 
-**1.** Edit the *ansible_host* parameter by replacing **<injector_host>** with the host IP address/DNS name of the host where you want to install the injector component. For example:
+*Configuration Steps*:
+
+**1.** Configure the *ansible_host* parameter by replacing **myinjectorhost.addr.com** with the host IP address/DNS name of the host where you want to install the injector controller component. For example:
+
 ```
 File: hosts
 
-injector ansible_host=myinjectorhost.addr.com ansible_user=centos
+[hyperfoil_controller]
+myinjectorhost.addr.com ansible_hostname=myinjectorhost.addr.com ansible_host=myinjectorhost.addr.com ansible_role=root
+
+[hyperfoil_agent]
+myinjectoragenthost.addr.com ansible_host=myinjectoragenthost.addr.com ansible_hostname=myinjectoragenthost.addr.com ansible_role=root
 ```
 
 **2.** Configure the following settings in `roles/user-traffic-reader/defaults/main.yml` file:
@@ -100,6 +103,11 @@ threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
 threescale_services: ""
 ```
 
+Injector host’s hardware resources should not be performance tests bottleneck. Enough cpu, memory and network resources should be available.
+There are two injector services. The controller has one instance. The agent(s) may have 1 or many. 
+
+*Installation Step*:
+
 **3.** Execute the playbook `injector.yml` to deploy injector.
 
 Avoid ssh issues when running anisble playbooks
@@ -115,19 +123,23 @@ Start the playbook
 
 
 ```bash
+cd deployment/
 ansible-playbook -i hosts injector.yml
 ```
 
+Managed node host:
+* Docker >= 1.12
+* python >= 2.6
+* docker-py >= 1.7.0
+* ansible >= 2.3.1.0
+* Java => 8
+
+
 ### Setup traffic profiles
 
-**Steps**:
+*Configuration Steps*:
 
 **1.** Edit the *ansible_host* parameter by replacing **<injector_host>** with the host IP address/DNS name of the host where you want to install the injector component. For example:
-```
-File: hosts
-
-injector ansible_host=myinjectorhost.addr.com ansible_user=centos
-```
 
 **2.** Configure the following settings in `roles/profiled-traffic-generator/defaults/main.yml` file:
 * `threescale_portal_endpoint`: 3scale portal endpoint
@@ -135,7 +147,7 @@ injector ansible_host=myinjectorhost.addr.com ansible_user=centos
 * `private_base_url`: Private Base URL used for the tests. Make sure your private application behaves like an echo api service.
 
 ```
-File: roles/profiled-traffic-generator/defaults/main.yml
+File: roles/traffic-configurator/defaults/main.yml
 
 # URI that includes your password and portal endpoint in the following format: <schema>://<password>@<admin-portal-domain>.
 # The <password> can be either the provider key or an access token for the 3scale Account Management API.
@@ -156,6 +168,8 @@ traffic_profile: <TRAFFIC_PROFILE>
 private_base_url: <PRIVATE_BASE_URL>
 ```
 
+*Installation Step*:
+
 **3.** Execute the playbook `profiled-injector.yml` to deploy injector.
 
 Avoid ssh issues when running anisble playbooks
@@ -171,28 +185,30 @@ Start the playbook
 
 ```bash
 ansible-playbook -i hosts profiled-injector.yml
-```
-
-## Run tests
-
-**1.** Configure performance parameters:
 
 ```
-File: run.yml
 
-<RPS>: Maximum requests per second to send
-<DURATION>: Duration of the performance test in seconds
-<THREADS>: Number of threads (parallel connections) to use
+## Configure test run
+
+**1.** Configure users per run-phase parameters:
+
+```
+File: group_vars/all.yml
+
+ramp_up_target_users_per_sec: 1
+steady_state_users: 1
+ramp_down_users: 1
 ```
 
 **2.** Run tests
+## Run tests
 
 ```bash
-ansible-playbook -i hosts run.yml
+usage: ansible-playbook -i hosts -i benchmarks/3scale.csv run.yml
 ```
 
-The test results of the last execution are automatically stored in **/opt/3scale-perftest/reports**.
-This directory can be fetched and then the **report/index.html** can be opened to view the results.
+The test results of the last execution are automatically stored in **/tmp/hyperfoil/workspace/run/<test_runid>/**.
+This directory can be fetched and then the **index.html** can be opened to view the results.
 
 ## Sustained load
 
