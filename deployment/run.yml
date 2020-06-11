@@ -1,8 +1,20 @@
 ---
-- hosts: injector
-  become: yes
+- hosts:
+    - hyperfoil_controller
+    - hyperfoil_agent
   tasks:
-    - name: run performace test
-      shell: /usr/local/bin/3scale-perftest -r <RPS> -d <DURATION> -t <THREADS>
-      register: out
-    - debug: var=out.stdout_lines
+    - name: Assign path variable
+      set_fact:
+        csv_dest_file_path: "{{ csv_file_path }}/{{ csv_file_name }}"
+- hosts: hyperfoil_controller
+  tasks:
+  - include_role:
+      name: hyperfoil.hyperfoil_test
+    vars:
+      test_name: 3scale-benchmark
+      test_files:
+      - "{{ csv_file_path }}/{{ csv_file_name }}"
+- hosts: hyperfoil_controller
+  tasks:
+  - include_role:
+      name: hyperfoil_generate_report

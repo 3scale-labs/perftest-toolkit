@@ -1,6 +1,30 @@
 ---
-- hosts: injector
-  become: yes
-  roles:
-    - user-traffic-reader
-    - injector-configurator
+- hosts:
+    - hyperfoil_controller
+  tasks:
+  - include_role:
+      name: user-traffic-reader
+- hosts:
+    - hyperfoil_controller
+  tasks:
+    - name: Assign path variable
+      set_fact:
+        csv_dest_file_path: "{{ csv_file_path }}/{{ csv_file_name }}"
+    - name: Retrieve the CSV inventory file
+      fetch:
+        src: "{{ csv_file_path }}/{{ csv_file_name }}"
+        dest: "{{ playbook_dir }}/{{ toolkit_csv_file_path }}/"
+        flat: yes
+- hosts:
+    - hyperfoil_controller
+    - hyperfoil_agent
+  tasks:
+    - name: Distribute CSV inventory source file
+      copy:
+        src: "{{ playbook_dir }}/{{ toolkit_csv_file_path }}/{{ csv_file_name }}"
+        dest: "{{ csv_file_path }}/"
+        force: yes
+- hosts: hyperfoil_controller
+  tasks:
+  - include_role:
+      name: injector-setup

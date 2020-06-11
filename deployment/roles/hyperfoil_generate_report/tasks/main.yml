@@ -1,0 +1,4 @@
+---
+- name: Creates hyperfoil report
+  sh: "{{ role_path }}/files/report.sh {{ test_run.location }}/{{ test_runid }}/all.json > {{ test_run.location }}/{{ test_runid }}/index-{{ test_runid }}.html"
+
