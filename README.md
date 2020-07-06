@@ -54,7 +54,6 @@ Managed node host:
 * Docker >= 1.12
 * python >= 2.6
 * docker-py >= 1.7.0
-* Java => 8
 
 Make sure that the injector host’s hardware resources is not the performance tests bottleneck. Enough cpu, memory and network resources should be available.
 
@@ -156,7 +155,6 @@ Managed node host:
 * python >= 2.6
 * docker-py >= 1.7.0
 * ansible >= 2.3.1.0
-* Java => 8
 
 
 ### Setup traffic profiles

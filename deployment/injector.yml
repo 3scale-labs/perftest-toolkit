@@ -1,6 +1,14 @@
 ---
 - hosts:
     - hyperfoil_controller
+    - hyperfoil_agent
+  tasks:
+  - name: Install Java
+    package:
+      name: java-1.8.0-openjdk-headless
+      state: present
+- hosts:
+    - hyperfoil_controller
   tasks:
   - include_role:
       name: user-traffic-reader
