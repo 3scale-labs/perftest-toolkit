@@ -1,27 +1,34 @@
 ---
 
+RPS: Maximum requests per second to send
+DURATION: Duration of the performance test in seconds
+THREADS: Number of parallel threads to use
+
 shared_connections: 64
 
-ramp_up_target_users_per_sec: 8
-ramp_up_duration_sec: 60
+ramp_up_target_users_per_sec: "{{ RPS }}"
+ramp_up_duration_sec: 1
 
 csv_file_path: /tmp
 csv_file_name: 3scale.csv
 
 toolkit_csv_file_path: benchmarks
 
-steady_state_users: 8
-steady_state_duration: 60
+steady_state_users: "{{ RPS }}"
+steady_state_duration: "{{ DURATION }}"
 
-ramp_down_users: 8
-ramp_down_duration: 60
+ramp_down_users: "{{ RPS }}"
+ramp_down_duration: 1
 
 hyperfoil_agent_group: hyperfoil_agent
 hyperfoil_agent_port: 22
 
 injector_target_group: injector_target
-injector_target_port: 80
+injector_hyperfoil_target_protocol: https
+injector_hyperfoil_target_port: 443
 
 hyperfoil_controller_group: hyperfoil_controller
 
 hf_version: 0.9
+
+injector_hyperfoil_agent_threads: "{{ THREADS }}"

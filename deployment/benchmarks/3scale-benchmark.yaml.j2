@@ -5,7 +5,7 @@ agents:
 {% endfor %}
 http:
 {% for host in groups[injector_target_group] %}
-- host: http://{{ host }}:{{ injector_target_port }}
+- host: {{ injector_hyperfoil_target_protocol }}://{{ host }}:{{ injector_hyperfoil_target_port }}
   sharedConnections: {{ shared_connections }}
 {% endfor %}
 phases:
@@ -25,7 +25,7 @@ phases:
                0: target-host
                1: uri
           - template:
-              pattern: ${target-host}:{{ injector_target_port }}
+              pattern: ${target-host}:{{ injector_hyperfoil_target_port }}
               toVar: target-authority
           - httpRequest:
               authority:
@@ -49,3 +49,4 @@ phases:
         - rampUp
         - steadyState
       scenario: *scenario
+threads: {{ injector_hyperfoil_agent_threads }}

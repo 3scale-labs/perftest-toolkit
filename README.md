@@ -58,6 +58,20 @@ Managed node host:
 
 Make sure that the injector host’s hardware resources is not the performance tests bottleneck. Enough cpu, memory and network resources should be available.
 
+### Common settings
+
+** HTTP/HTTPS **
+
+By default, the injector will generate HTTPS traffic on the port number 443.
+You can change this setting editing *injector_hyperfoil_target_protocol* and *injector_hyperfoil_target_port* parameters.
+
+```
+File: group_vars/all.yml
+
+injector_hyperfoil_target_protocol: https
+injector_hyperfoil_target_port: 443
+```
+
 *Installation Step*:
 
 Install the injector Ansible Galaxy roles on the Ansible Control node:
@@ -66,8 +80,9 @@ Install the injector Ansible Galaxy roles on the Ansible Control node:
 ansible-galaxy install hyperfoil.hyperfoil_setup,0.8
 ansible-galaxy install hyperfoil.hyperfoil_shutdown,0.8
 ansible-galaxy install hyperfoil.hyperfoil_test,0.8
-ansible-galaxy install hyperfoil.hyperfoil_generate_report,0.0.1
 ```
+
+### Test your 3scale services
 
 **Steps**:
 
@@ -83,6 +98,15 @@ myinjectorhost.addr.com ansible_hostname=myinjectorhost.addr.com ansible_host=my
 
 [hyperfoil_agent]
 myinjectoragenthost.addr.com ansible_host=myinjectoragenthost.addr.com ansible_hostname=myinjectoragenthost.addr.com ansible_role=root
+```
+
+More than one injector agent can be configured. Useful when the injector becomes a bottleneck. For example to configure two agents:
+
+```
+File: hosts
+[hyperfoil_agent]
+myinjectoragenthost.addr.com ansible_host=myinjectoragenthost.addr.com ansible_hostname=myinjectoragenthost.addr.com ansible_role=root
+myinjectoragenthost02.addr.com ansible_host=myinjectoragenthost02.addr.com ansible_hostname=myinjectoragenthost02.addr.com ansible_role=root
 ```
 
 **2.** Configure the following settings in `roles/user-traffic-reader/defaults/main.yml` file:
@@ -188,27 +212,26 @@ ansible-playbook -i hosts profiled-injector.yml
 
 ```
 
-## Configure test run
+## Run tests
 
 **1.** Configure users per run-phase parameters:
 
 ```
 File: group_vars/all.yml
 
-ramp_up_target_users_per_sec: 1
-steady_state_users: 1
-ramp_down_users: 1
+RPS: Maximum requests per second to send
+DURATION: Duration of the performance test in seconds
+THREADS: Number of parallel threads to use
 ```
 
 **2.** Run tests
-## Run tests
 
 ```bash
 usage: ansible-playbook -i hosts -i benchmarks/3scale.csv run.yml
 ```
 
-The test results of the last execution are automatically stored in **/tmp/hyperfoil/workspace/run/<test_runid>/**.
-This directory can be fetched and then the **index.html** can be opened to view the results.
+The test results of the last execution are automatically stored in **/opt/3scale-perftest/reports**.
+This directory can be fetched and then the **report/index-<runid>.html** can be opened to view the results.
 
 ## Sustained load
 
