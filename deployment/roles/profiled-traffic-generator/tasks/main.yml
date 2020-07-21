@@ -1,5 +1,5 @@
----
 # tasks file for profiled-traffic-generator
+---
 - name: Creates tmp traffic directory
   tempfile:
     state: directory

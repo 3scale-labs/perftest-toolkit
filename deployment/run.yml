@@ -1,11 +1,4 @@
 ---
-- hosts:
-    - hyperfoil_controller
-    - hyperfoil_agent
-  tasks:
-    - name: Assign path variable
-      set_fact:
-        csv_dest_file_path: "{{ csv_file_path }}/{{ csv_file_name }}"
 - hosts: hyperfoil_controller
   tasks:
   - include_role:

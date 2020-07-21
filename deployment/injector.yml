@@ -3,10 +3,9 @@
     - hyperfoil_controller
     - hyperfoil_agent
   tasks:
-  - name: Install Java
-    package:
-      name: java-1.8.0-openjdk-headless
-      state: present
+  - include_role:
+      name: platform-setup
+  become: yes
 - hosts:
     - hyperfoil_controller
   tasks:
@@ -15,23 +14,14 @@
 - hosts:
     - hyperfoil_controller
   tasks:
-    - name: Assign path variable
-      set_fact:
-        csv_dest_file_path: "{{ csv_file_path }}/{{ csv_file_name }}"
-    - name: Retrieve the CSV inventory file
-      fetch:
-        src: "{{ csv_file_path }}/{{ csv_file_name }}"
-        dest: "{{ playbook_dir }}/{{ toolkit_csv_file_path }}/"
-        flat: yes
+  - include_role:
+      name: traffic-retriever
 - hosts:
     - hyperfoil_controller
     - hyperfoil_agent
   tasks:
-    - name: Distribute CSV inventory source file
-      copy:
-        src: "{{ playbook_dir }}/{{ toolkit_csv_file_path }}/{{ csv_file_name }}"
-        dest: "{{ csv_file_path }}/"
-        force: yes
+  - include_role:
+      name: traffic-distributor
 - hosts: hyperfoil_controller
   tasks:
   - include_role:

@@ -1,0 +1,7 @@
+# role tasks file for traffic-distribution
+---
+- name: Distribute CSV inventory source file
+  copy:
+    src: "{{ playbook_dir }}/{{ toolkit_csv_file_path }}/{{ csv_file_name }}"
+    dest: "{{ csv_file_path }}/"
+    force: yes
