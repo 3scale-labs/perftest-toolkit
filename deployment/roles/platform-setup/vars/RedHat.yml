@@ -1,0 +1,5 @@
+---
+java_package:
+  - java-latest-openjdk
+unzip_package:
+  - unzip

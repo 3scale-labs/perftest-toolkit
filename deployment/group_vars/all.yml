@@ -1,10 +1,11 @@
+# variables file for group_vars
 ---
 
 RPS: Maximum requests per second to send
 DURATION: Duration of the performance test in seconds
-THREADS: Number of parallel threads to use
+CONCURRENCY: Number of parallel threads to use
 
-shared_connections: 64
+shared_connections: "{{ CONCURRENCY }}"
 
 ramp_up_target_users_per_sec: "{{ RPS }}"
 ramp_up_duration_sec: 1
@@ -20,6 +21,8 @@ steady_state_duration: "{{ DURATION }}"
 ramp_down_users: "{{ RPS }}"
 ramp_down_duration: 1
 
+hyperfoil_controller_port: 8090
+
 hyperfoil_agent_group: hyperfoil_agent
 hyperfoil_agent_port: 22
 
@@ -31,4 +34,4 @@ hyperfoil_controller_group: hyperfoil_controller
 
 hf_version: 0.9
 
-injector_hyperfoil_agent_threads: "{{ THREADS }}"
+injector_hyperfoil_agent_threads: 4

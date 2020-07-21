@@ -1,0 +1,7 @@
+# role tasks file for traffic-retriever
+---
+- name: Retrieve the CSV inventory file
+  fetch:
+    src: "{{ csv_file_path }}/{{ csv_file_name }}"
+    dest: "{{ playbook_dir }}/{{ toolkit_csv_file_path }}/"
+    flat: yes

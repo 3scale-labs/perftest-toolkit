@@ -1,0 +1,5 @@
+---
+java_package:
+  - openjdk-8-jre-headless
+unzip_package:
+  - unzip

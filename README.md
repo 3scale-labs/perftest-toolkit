@@ -71,21 +71,17 @@ injector_hyperfoil_target_protocol: https
 injector_hyperfoil_target_port: 443
 ```
 
-*Installation Step*:
-
 Install the injector Ansible Galaxy roles on the Ansible Control node:
 
 ```bash
-ansible-galaxy install hyperfoil.hyperfoil_setup,0.8
-ansible-galaxy install hyperfoil.hyperfoil_shutdown,0.8
-ansible-galaxy install hyperfoil.hyperfoil_test,0.8
+ansible-galaxy install hyperfoil.hyperfoil_setup,0.8.0
+ansible-galaxy install hyperfoil.hyperfoil_shutdown,0.8.0
+ansible-galaxy install hyperfoil.hyperfoil_test,0.8.0
 ```
 
 ### Test your 3scale services
 
 **Steps**:
-
-*Configuration Steps*:
 
 **1.** Configure the *ansible_host* parameter by replacing **myinjectorhost.addr.com** with the host IP address/DNS name of the host where you want to install the injector controller component. For example:
 
@@ -129,8 +125,6 @@ threescale_services: ""
 Injector host’s hardware resources should not be performance tests bottleneck. Enough cpu, memory and network resources should be available.
 There are two injector services. The controller has one instance. The agent(s) may have 1 or many. 
 
-*Installation Step*:
-
 **3.** Execute the playbook `injector.yml` to deploy injector.
 
 ```bash
@@ -147,7 +141,7 @@ Managed node host:
 
 ### Setup traffic profiles
 
-*Configuration Steps*:
+**Steps**:
 
 **1.** Edit the *ansible_host* parameter by replacing **<injector_host>** with the host IP address/DNS name of the host where you want to install the injector component. For example:
 
@@ -177,8 +171,6 @@ traffic_profile: <TRAFFIC_PROFILE>
 # example: https://echo-api.3scale.net:443
 private_base_url: <PRIVATE_BASE_URL>
 ```
-
-*Installation Step*:
 
 **3.** Execute the playbook `profiled-injector.yml` to deploy injector.
 
