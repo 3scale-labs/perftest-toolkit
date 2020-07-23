@@ -3,9 +3,8 @@
 
 RPS: Maximum requests per second to send
 DURATION: Duration of the performance test in seconds
-CONCURRENCY: Number of parallel threads to use
 
-shared_connections: "{{ CONCURRENCY }}"
+shared_connections: 100
 
 ramp_up_target_users_per_sec: "{{ RPS }}"
 ramp_up_duration_sec: 1
