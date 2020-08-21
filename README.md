@@ -74,9 +74,9 @@ injector_hyperfoil_target_port: 443
 Install the injector Ansible Galaxy roles on the Ansible Control node:
 
 ```bash
-ansible-galaxy install hyperfoil.hyperfoil_setup,0.8.0
-ansible-galaxy install hyperfoil.hyperfoil_shutdown,0.8.0
-ansible-galaxy install hyperfoil.hyperfoil_test,0.8.0
+ansible-galaxy install hyperfoil.hyperfoil_setup,0.9.1
+ansible-galaxy install hyperfoil.hyperfoil_shutdown,0.9.1
+ansible-galaxy install hyperfoil.hyperfoil_test,0.9.1
 ```
 
 ### Test your 3scale services
