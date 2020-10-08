@@ -48,11 +48,17 @@ There are **two** ways of running your tests and the injector has to be configur
 **Requirements**:
 
 Control node:
-* ansible >= 2.3.1.0
+* ansible >= 2.9.14
+* python >= 3.0
+* Install ansible requirements
+```
+cd deployment
+ansible-galaxy install -r requirements.yaml
+```
 
 Managed node host:
 * Docker >= 1.12
-* python >= 2.6
+* python >= 2.7
 * docker-py >= 1.7.0
 
 Make sure that the injector host’s hardware resources is not the performance tests bottleneck. Enough cpu, memory and network resources should be available.
@@ -69,14 +75,6 @@ File: group_vars/all.yml
 
 injector_hyperfoil_target_protocol: https
 injector_hyperfoil_target_port: 443
-```
-
-Install the injector Ansible Galaxy roles on the Ansible Control node:
-
-```bash
-ansible-galaxy install hyperfoil.hyperfoil_setup,0.9.1
-ansible-galaxy install hyperfoil.hyperfoil_shutdown,0.9.1
-ansible-galaxy install hyperfoil.hyperfoil_test,0.9.1
 ```
 
 ### Test your 3scale services
