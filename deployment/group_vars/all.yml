@@ -1,36 +1,16 @@
 # variables file for group_vars
 ---
-
-RPS: Maximum requests per second to send
-DURATION: Duration of the performance test in seconds
-
-shared_connections: 100
-
-ramp_up_target_users_per_sec: "{{ RPS }}"
-ramp_up_duration_sec: 1
-
 csv_file_path: /tmp
 csv_file_name: 3scale.csv
-
+reports_path: /tmp/3scale-perftest/reports
+csv_dest_file_path: "{{ csv_file_path }}/{{ csv_file_name }}"
 toolkit_csv_file_path: benchmarks
-
-steady_state_users: "{{ RPS }}"
-steady_state_duration: "{{ DURATION }}"
-
-ramp_down_users: "{{ RPS }}"
-ramp_down_duration: 1
-
-hyperfoil_controller_port: 8090
-
-hyperfoil_agent_group: hyperfoil_agent
-hyperfoil_agent_port: 22
-
 injector_target_group: injector_target
+hyperfoil_agent_port: 22
+hyperfoil_controller_port: 8090
+hyperfoil_agent_group: hyperfoil_agent
+hyperfoil_controller_group: hyperfoil_controller
+injector_hyperfoil_agent_threads: 4
 injector_hyperfoil_target_protocol: https
 injector_hyperfoil_target_port: 443
-
-hyperfoil_controller_group: hyperfoil_controller
-
-hf_version: 0.9
-
-injector_hyperfoil_agent_threads: 4
+hyperfoil_version: 0.9

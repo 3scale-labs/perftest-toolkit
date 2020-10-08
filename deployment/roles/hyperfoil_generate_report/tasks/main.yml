@@ -1,13 +1,9 @@
 # role task file for hyperfoil_generate_report
 ---
-- name: Creates tmp report directory
-  tempfile:
-    state: directory
-  register: tempdir_report
-- name: Creates reports directory
+- name: Reports directory
   file:
     state: directory
-    path: /opt/3scale-perftest/reports
+    path: "{{ reports_path }}"
     recurse: yes
     mode: '0755'
 - name: Retrieve the run data
@@ -15,11 +11,14 @@
     url: "http://{{ hyperfoil_controller_host }}:{{ hyperfoil_controller_port }}/run/{{ test_runid }}/stats/all"
     headers:
       Accept: 'application/json'
-    dest: "{{ tempdir_report.path }}/{{ test_runid }}-all.json"
+    dest: "{{ reports_path }}/{{ test_runid }}-all.json"
 - name: Creates hyperfoil report
-  shell: "cat {{ tempdir_report.path }}/{{ test_runid }}-all.json | docker run -i --rm quay.io/hyperfoil/hyperfoil-report /opt/report.sh > /opt/3scale-perftest/reports/index-{{ test_runid }}.html"
-- name: Remove the tmp report directory
-  file:
-    path: "{{ tempdir_report.path }}"
-    state: absent
-  when: tempdir_report.path is defined
+  docker_container:
+    name: hyperfoil_report
+    state: started
+    tty: True
+    detach: no
+    image: quay.io/hyperfoil/hyperfoil-report
+    command: "bash -c \"/opt/report.sh /tmp/reports/{{ test_runid }}-all.json > /tmp/reports/index-{{ test_runid }}.html\""
+    volumes:
+      - "{{ reports_path }}:/tmp/reports"
