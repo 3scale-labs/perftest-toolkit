@@ -2,27 +2,22 @@
 - hosts:
     - hyperfoil_controller
     - hyperfoil_agent
-  tasks:
-  - include_role:
-      name: platform-setup
+  roles:
+    - platform-setup
   become: yes
 - hosts:
     - hyperfoil_controller
-  tasks:
-  - include_role:
-      name: user-traffic-reader
+  roles:
+    - user-traffic-reader
 - hosts:
     - hyperfoil_controller
-  tasks:
-  - include_role:
-      name: traffic-retriever
+  roles:
+    - traffic-retriever
 - hosts:
     - hyperfoil_controller
     - hyperfoil_agent
-  tasks:
-  - include_role:
-      name: traffic-distributor
+  roles:
+    - traffic-distributor
 - hosts: hyperfoil_controller
-  tasks:
-  - include_role:
-      name: injector-setup
+  roles:
+    - injector-setup

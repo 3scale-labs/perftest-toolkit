@@ -8,45 +8,28 @@ http:
 - host: {{ injector_hyperfoil_target_protocol }}://{{ host }}
   sharedConnections: {{ shared_connections }}
 {% endfor %}
-phases:
-- rampUp:
-    increasingRate:
-      initialUsersPerSec: 1
-      targetUsersPerSec: {{ ramp_up_target_users_per_sec }}
-      duration: {{ ramp_up_duration_sec }}
-      scenario: &scenario
-        initialSequences:
-        - testSequence:
-          - randomCsvRow:
-             file: {{ csv_dest_file_path }}
-             skipComments: 'True'
-             removeQuotes: 'True'
-             columns:
-               0: target-host
-               1: uri
-          - template:
-              pattern: ${target-host}:{{ injector_hyperfoil_target_port }}
-              toVar: target-authority
-          - httpRequest:
-              authority:
-                fromVar: target-authority
-              GET:
-                fromVar: uri
-              headers:
-                HOST:
-                  fromVar: target-host
-- steadyState:
-    constantRate:
-      usersPerSec: {{ steady_state_users }}
-      duration: {{ steady_state_duration }}
-      startAfter: rampUp
-      scenario: *scenario
-- rampDown:
-    constantRate:
-      usersPerSec: {{ ramp_down_users }}
-      duration: {{ ramp_down_duration }}
-      startAfterStrict:
-        - rampUp
-        - steadyState
-      scenario: *scenario
+usersPerSec: {{ users_per_sec }}
+duration: {{ duration_sec }}s
+maxDuration: {{ duration_sec }}s
+scenario:
+- testSequence:
+  - randomCsvRow:
+     file: {{ csv_dest_file_path }}
+     skipComments: 'True'
+     removeQuotes: 'True'
+     columns:
+       0: target-host
+       1: uri
+  - template:
+      pattern: ${target-host}:{{ injector_hyperfoil_target_port }}
+      toVar: target-authority
+  - httpRequest:
+      authority:
+        fromVar: target-authority
+      GET:
+        fromVar: uri
+      headers:
+        HOST:
+          fromVar: target-host
+
 threads: {{ injector_hyperfoil_agent_threads }}
