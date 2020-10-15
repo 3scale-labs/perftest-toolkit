@@ -6,9 +6,9 @@
     test_name: 3scale-benchmark
     test_files:
       - "{{ csv_dest_file_path }}"
-    shared_connections: 4
-    users_per_sec: 10
-    duration_sec: 10
+    shared_connections: <SHARED_CONNECTIONS>
+    users_per_sec: <USERS_PER_SEC>
+    duration_sec: <DURATION_SEC>
 - hosts: hyperfoil_controller
   become: yes
   roles:
