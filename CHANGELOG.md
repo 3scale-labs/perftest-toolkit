@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.2.2] - 2020-10-15
+
+### Fixed
+
+- fix: old 3scale releases returned 404 Not found on backend endpoints [PR #55](https://github.com/3scale/perftest-toolkit/pull/55)
+
 ## [2.2.1] - 2020-06-02
 
 ### Fixed
