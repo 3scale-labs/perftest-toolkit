@@ -81,25 +81,33 @@ injector_hyperfoil_target_port: 443
 
 **Steps**:
 
-**1.** Configure the *ansible_host* parameter by replacing **myinjectorhost.addr.com** with the host IP address/DNS name of the host where you want to install the injector controller component. For example:
+**1.** Provide **hyperfoil controller** host IP address or DNS name and at least one **hyperfoil agent** host IP address or DNS name. For example:
 
 ```
 File: hosts
 
 [hyperfoil_controller]
-myinjectorhost.addr.com ansible_hostname=myinjectorhost.addr.com ansible_host=myinjectorhost.addr.com ansible_role=root
+controllerhost.example.com ansible_host=controllerhost.example.com ansible_role=root
 
 [hyperfoil_agent]
-myinjectoragenthost.addr.com ansible_host=myinjectoragenthost.addr.com ansible_hostname=myinjectoragenthost.addr.com ansible_role=root
+agenthost.example.com ansible_host=agenthost.example.com ansible_role=root
 ```
 
-More than one injector agent can be configured. Useful when the injector becomes a bottleneck. For example to configure two agents:
+**Note 01**: make sure defined ansible user has ssh login access to the host without password.
+
+**Note 02**: make sure hyperfoil controller host has ssh login access to the agent host without password.
+
+More than one hyperfoil agent can be configured. Useful when the injector becomes a bottleneck. For example to configure two agents:
 
 ```
 File: hosts
+
+[hyperfoil_controller]
+controllerhost.example.com ansible_host=controllerhost.example.com ansible_role=root
+
 [hyperfoil_agent]
-myinjectoragenthost.addr.com ansible_host=myinjectoragenthost.addr.com ansible_hostname=myinjectoragenthost.addr.com ansible_role=root
-myinjectoragenthost02.addr.com ansible_host=myinjectoragenthost02.addr.com ansible_hostname=myinjectoragenthost02.addr.com ansible_role=root
+agenthost01.example.com ansible_host=agenthost01.example.com ansible_role=root
+agenthost02.example.com ansible_host=agenthost02.example.com ansible_role=root
 ```
 
 **2.** Configure the following settings in `roles/user-traffic-reader/defaults/main.yml` file:
@@ -120,9 +128,6 @@ threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
 threescale_services: ""
 ```
 
-Injector host’s hardware resources should not be performance tests bottleneck. Enough cpu, memory and network resources should be available.
-There are two injector services. The controller has one instance. The agent(s) may have 1 or many. 
-
 **3.** Execute the playbook `injector.yml` to deploy injector.
 
 Avoid ssh issues when running anisble playbooks
@@ -136,24 +141,44 @@ pipelining = True
 
 Start the playbook
 
-
 ```bash
 cd deployment/
 ansible-playbook -i hosts injector.yml
 ```
 
-Managed node host:
-* Docker >= 1.12
-* python >= 2.6
-* docker-py >= 1.7.0
-* ansible >= 2.3.1.0
-
-
 ### Setup traffic profiles
+
+Skip these steps if testing your own 3scale services. This steps will setup 3scale services for performance testing.
 
 **Steps**:
 
-**1.** Edit the *ansible_host* parameter by replacing **<injector_host>** with the host IP address/DNS name of the host where you want to install the injector component. For example:
+**1.** Provide **hyperfoil controller** host IP address or DNS name and at least one **hyperfoil agent** host IP address or DNS name. For example:
+
+```
+File: hosts
+
+[hyperfoil_controller]
+controllerhost.example.com ansible_host=controllerhost.example.com ansible_role=root
+
+[hyperfoil_agent]
+agenthost.example.com ansible_host=agenthost.example.com ansible_role=root
+```
+
+**Note 01**: make sure defined ansible user has ssh login access to the host without password.
+**Note 02**: make sure hyperfoil controller host has ssh login access to the agent host without password.
+
+More than one hyperfoil agent can be configured. Useful when the injector becomes a bottleneck. For example to configure two agents:
+
+```
+File: hosts
+
+[hyperfoil_controller]
+controllerhost.example.com ansible_host=controllerhost.example.com ansible_role=root
+
+[hyperfoil_agent]
+agenthost01.example.com ansible_host=agenthost01.example.com ansible_role=root
+agenthost02.example.com ansible_host=agenthost02.example.com ansible_role=root
+```
 
 **2.** Configure the following settings in `roles/profiled-traffic-generator/defaults/main.yml` file:
 * `threescale_portal_endpoint`: 3scale portal endpoint
@@ -202,24 +227,26 @@ ansible-playbook -i hosts profiled-injector.yml
 
 ## Run tests
 
-**1.** Configure users per run-phase parameters:
+**1.** Configure testing settings:
 
 ```
-File: group_vars/all.yml
+File: run.yml
 
-RPS: Maximum requests per second to send
-DURATION: Duration of the performance test in seconds
-THREADS: Number of parallel threads to use
+USERS_PER_SEC: Requests per second
+DURATION_SEC: Duration of the performance test in seconds
+SHARED_CONNECTIONS: Number of connections open per target HOST
 ```
 
 **2.** Run tests
 
 ```bash
-usage: ansible-playbook -i hosts -i benchmarks/3scale.csv run.yml
+ansible-playbook -i hosts -i benchmarks/3scale.csv run.yml
 ```
 
-The test results of the last execution are automatically stored in **/opt/3scale-perftest/reports**.
-This directory can be fetched and then the **report/index-<runid>.html** can be opened to view the results.
+**3.** View Report
+
+The test results of the last execution are automatically stored in **deployment/benchmarks/index-<runid>.html**.
+The html file can be directly opened with your favorite web browser. 
 
 ## Sustained load
 
@@ -244,8 +271,6 @@ $ oc rsh backend-redis-2-nkrkk /bin/sh -i -c 'redis-cli -n 1 llen resque:queue:p
 ```
 
 ## Troubleshooting
-
-###
 
 Sometimes, even though all deployment commands run successfully, performance traffic may be broken.
 This might be due to a misconfiguration in any stage of the deployment process.
