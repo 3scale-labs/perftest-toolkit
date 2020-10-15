@@ -18,11 +18,11 @@ The goal is to help to resolve doubts or issues related to scalability or perfor
    * [Test your 3scale services](#test-your-3scale-services)
    * [Setup traffic profiles](#setup-traffic-profiles)
 * [Run tests](#run-tests)
+* [Sustained load](#sustained-load)
 * [Troubleshooting](#troubleshooting)
    * [Check apicast gateway configuration](#check-apicast-gateway-configuration)
    * [Check backend listener traffic](#check-backend-listener-traffic)
    * [Check upstream service traffic](#check-upstream-service-traffic)
-* [Sustained load](#sustained-load)
 
 Generated using [github-markdown-toc](https://github.com/ekalinin/github-markdown-toc)
 
@@ -102,6 +102,18 @@ threescale_services: ""
 
 **3.** Execute the playbook `injector.yml` to deploy injector.
 
+Avoid ssh issues when running anisble playbooks
+
+```bash
+$ cat ~/.ansible.cfg
+[ssh_connection]
+ssh_args = -o ServerAliveInterval=30
+pipelining = True
+```
+
+Start the playbook
+
+
 ```bash
 ansible-playbook -i hosts injector.yml
 ```
@@ -146,6 +158,17 @@ private_base_url: <PRIVATE_BASE_URL>
 
 **3.** Execute the playbook `profiled-injector.yml` to deploy injector.
 
+Avoid ssh issues when running anisble playbooks
+
+```bash
+$ cat ~/.ansible.cfg
+[ssh_connection]
+ssh_args = -o ServerAliveInterval=30
+pipelining = True
+```
+
+Start the playbook
+
 ```bash
 ansible-playbook -i hosts profiled-injector.yml
 ```
@@ -171,7 +194,31 @@ ansible-playbook -i hosts run.yml
 The test results of the last execution are automatically stored in **/opt/3scale-perftest/reports**.
 This directory can be fetched and then the **report/index.html** can be opened to view the results.
 
+## Sustained load
+
+Some performance test are looking for *peak* and *sustained* traffic maximum performance.
+*Sustained* traffic is defined as traffic load where *Job Queue* size is always at low levels, or even empty.
+For *sustained* traffic performance benchmark, *Job Queue* must be monitorized.
+
+This is a small guideline to monitor *Job Queue* size:
+
+- Get backend redis pod
+
+```bash
+$ oc get pods | grep redis
+backend-redis-2-nkrkk         1/1       Running   0          14d
+```
+
+- Get Job Queue size
+
+```bash
+$ oc rsh backend-redis-2-nkrkk /bin/sh -i -c 'redis-cli -n 1 llen resque:queue:priority'
+(integer) 0
+```
+
 ## Troubleshooting
+
+###
 
 Sometimes, even though all deployment commands run successfully, performance traffic may be broken.
 This might be due to a misconfiguration in any stage of the deployment process.
@@ -235,24 +282,3 @@ the last usual suspect is upstream or upstream configuration.
 
 Check *upstream* uri is correctly configured in your 3scale configuration
 
-## Sustained load
-
-Some performance test are looking for *peak* and *sustained* traffic maximum performance.
-*Sustained* traffic is defined as traffic load where *Job Queue* size is always at low levels, or even empty.
-For *sustained* traffic performance benchmark, *Job Queue* must be monitorized.
-
-This is a small guideline to monitor *Job Queue* size:
-
-- Get backend redis pod
-
-```bash
-$ oc get pods | grep redis
-backend-redis-2-nkrkk         1/1       Running   0          14d
-```
-
-- Get Job Queue size
-
-```bash
-$ oc rsh backend-redis-2-nkrkk /bin/sh -i -c 'redis-cli -n 1 llen resque:queue:priority'
-(integer) 0
-```
