@@ -246,7 +246,7 @@ ansible-playbook -i hosts -i benchmarks/3scale.csv run.yml
 **3.** View Report
 
 The test results of the last execution are automatically stored in **deployment/benchmarks/index-<runid>.html**.
-The html file can be directly opened with your favorite web browser. 
+The html file can be directly opened with your favorite web browser.
 
 ## Sustained load
 
