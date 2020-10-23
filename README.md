@@ -94,6 +94,7 @@ agenthost.example.com ansible_host=agenthost.example.com ansible_role=root
 ```
 
 **Note 01**: make sure defined ansible user has ssh login access to the host without password.
+
 **Note 02**: make sure hyperfoil controller host has ssh login access to the agent host without password.
 
 More than one hyperfoil agent can be configured. Useful when the injector becomes a bottleneck. For example to configure two agents:
@@ -245,7 +246,7 @@ ansible-playbook -i hosts -i benchmarks/3scale.csv run.yml
 **3.** View Report
 
 The test results of the last execution are automatically stored in **deployment/benchmarks/index-<runid>.html**.
-The html file can be directly opened with your favorite web browser. 
+The html file can be directly opened with your favorite web browser.
 
 ## Troubleshooting
 
