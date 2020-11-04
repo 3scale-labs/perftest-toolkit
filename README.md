@@ -41,18 +41,24 @@ High level overview is quite simple. Main components are represented in the diag
 
 There are **two** ways of running your tests and the injector has to be configured accordingly.
 
-* [Test your own 3scale services](#test-your-3scale-services): The injector will be configured to use your 3scale products (a.k.a. services).
+* [Test your own 3scale services](#test-your-3scale-services): The injector will be custom configured to use your 3scale products (a.k.a. services).
 
 * [Setup traffic profiles](#setup-traffic-profiles): Configure your performance tests to use synthetically generated traffic based on traffic models.
 
 **Requirements**:
 
 Control node:
-* ansible >= 2.3.1.0
+* ansible >= 2.9.14
+* python >= 3.0
+* Install ansible requirements
+```
+cd deployment
+ansible-galaxy install -r requirements.yaml
+```
 
 Managed node host:
 * Docker >= 1.12
-* python >= 2.6
+* python >= 2.7
 * docker-py >= 1.7.0
 
 Make sure that the injector host’s hardware resources is not the performance tests bottleneck. Enough cpu, memory and network resources should be available.
@@ -62,24 +68,46 @@ Make sure that the injector host’s hardware resources is not the performance t
 ** HTTP/HTTPS **
 
 By default, the injector will generate HTTPS traffic on the port number 443.
-You can change this setting editing *injector_jmeter_protocol* and *injector_jmeter_target_port* parameters.
+You can change this setting editing *injector_hyperfoil_target_protocol* and *injector_hyperfoil_target_port* parameters.
 
 ```
-File: roles/injector-configurator/defaults/main.yml
+File: group_vars/all.yml
 
-injector_jmeter_protocol: https
-injector_jmeter_target_port: 443
+injector_hyperfoil_target_protocol: https
+injector_hyperfoil_target_port: 443
 ```
 
 ### Test your 3scale services
 
 **Steps**:
 
-**1.** Edit the *ansible_host* parameter by replacing **<injector_host>** with the host IP address/DNS name of the host where you want to install the injector component. For example:
+**1.** Provide **hyperfoil controller** host IP address or DNS name and at least one **hyperfoil agent** host IP address or DNS name. For example:
+
 ```
 File: hosts
 
-injector ansible_host=myinjectorhost.addr.com ansible_user=centos
+[hyperfoil_controller]
+controllerhost.example.com ansible_host=controllerhost.example.com ansible_role=root
+
+[hyperfoil_agent]
+agenthost.example.com ansible_host=agenthost.example.com ansible_role=root
+```
+
+**Note 01**: make sure defined ansible user has ssh login access to the host without password.
+
+**Note 02**: make sure hyperfoil controller host has ssh login access to the agent host without password.
+
+More than one hyperfoil agent can be configured. Useful when the injector becomes a bottleneck. For example to configure two agents:
+
+```
+File: hosts
+
+[hyperfoil_controller]
+controllerhost.example.com ansible_host=controllerhost.example.com ansible_role=root
+
+[hyperfoil_agent]
+agenthost01.example.com ansible_host=agenthost01.example.com ansible_role=root
+agenthost02.example.com ansible_host=agenthost02.example.com ansible_role=root
 ```
 
 **2.** Configure the following settings in `roles/user-traffic-reader/defaults/main.yml` file:
@@ -113,20 +141,43 @@ pipelining = True
 
 Start the playbook
 
-
 ```bash
+cd deployment/
 ansible-playbook -i hosts injector.yml
 ```
 
 ### Setup traffic profiles
 
+Skip these steps if testing your own 3scale services. This steps will setup 3scale services for performance testing.
+
 **Steps**:
 
-**1.** Edit the *ansible_host* parameter by replacing **<injector_host>** with the host IP address/DNS name of the host where you want to install the injector component. For example:
+**1.** Provide **hyperfoil controller** host IP address or DNS name and at least one **hyperfoil agent** host IP address or DNS name. For example:
+
 ```
 File: hosts
 
-injector ansible_host=myinjectorhost.addr.com ansible_user=centos
+[hyperfoil_controller]
+controllerhost.example.com ansible_host=controllerhost.example.com ansible_role=root
+
+[hyperfoil_agent]
+agenthost.example.com ansible_host=agenthost.example.com ansible_role=root
+```
+
+**Note 01**: make sure defined ansible user has ssh login access to the host without password.
+**Note 02**: make sure hyperfoil controller host has ssh login access to the agent host without password.
+
+More than one hyperfoil agent can be configured. Useful when the injector becomes a bottleneck. For example to configure two agents:
+
+```
+File: hosts
+
+[hyperfoil_controller]
+controllerhost.example.com ansible_host=controllerhost.example.com ansible_role=root
+
+[hyperfoil_agent]
+agenthost01.example.com ansible_host=agenthost01.example.com ansible_role=root
+agenthost02.example.com ansible_host=agenthost02.example.com ansible_role=root
 ```
 
 **2.** Configure the following settings in `roles/profiled-traffic-generator/defaults/main.yml` file:
@@ -135,7 +186,7 @@ injector ansible_host=myinjectorhost.addr.com ansible_user=centos
 * `private_base_url`: Private Base URL used for the tests. Make sure your private application behaves like an echo api service.
 
 ```
-File: roles/profiled-traffic-generator/defaults/main.yml
+File: roles/traffic-configurator/defaults/main.yml
 
 # URI that includes your password and portal endpoint in the following format: <schema>://<password>@<admin-portal-domain>.
 # The <password> can be either the provider key or an access token for the 3scale Account Management API.
@@ -171,28 +222,31 @@ Start the playbook
 
 ```bash
 ansible-playbook -i hosts profiled-injector.yml
+
 ```
 
 ## Run tests
 
-**1.** Configure performance parameters:
+**1.** Configure testing settings:
 
 ```
 File: run.yml
 
-<RPS>: Maximum requests per second to send
-<DURATION>: Duration of the performance test in seconds
-<THREADS>: Number of threads (parallel connections) to use
+USERS_PER_SEC: Requests per second
+DURATION_SEC: Duration of the performance test in seconds
+SHARED_CONNECTIONS: Number of connections open per target HOST
 ```
 
 **2.** Run tests
 
 ```bash
-ansible-playbook -i hosts run.yml
+ansible-playbook -i hosts -i benchmarks/3scale.csv run.yml
 ```
 
-The test results of the last execution are automatically stored in **/opt/3scale-perftest/reports**.
-This directory can be fetched and then the **report/index.html** can be opened to view the results.
+**3.** View Report
+
+The test results of the last execution are automatically stored in **deployment/benchmarks/index-<runid>.html**.
+The html file can be directly opened with your favorite web browser.
 
 ## Sustained load
 
@@ -217,8 +271,6 @@ $ oc rsh backend-redis-2-nkrkk /bin/sh -i -c 'redis-cli -n 1 llen resque:queue:p
 ```
 
 ## Troubleshooting
-
-###
 
 Sometimes, even though all deployment commands run successfully, performance traffic may be broken.
 This might be due to a misconfiguration in any stage of the deployment process.

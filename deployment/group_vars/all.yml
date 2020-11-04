@@ -1,3 +1,16 @@
+# variables file for group_vars
 ---
-injector_root_path: "/opt/3scale-perftest"
-injector_traffic_path: "{{ injector_root_path }}/traffic"
+csv_file_path: /tmp
+csv_file_name: 3scale.csv
+reports_path: /tmp/3scale-perftest/reports
+csv_dest_file_path: "{{ csv_file_path }}/{{ csv_file_name }}"
+toolkit_csv_file_path: benchmarks
+injector_target_group: injector_target
+hyperfoil_agent_port: 22
+hyperfoil_controller_port: 8090
+hyperfoil_agent_group: hyperfoil_agent
+hyperfoil_controller_group: hyperfoil_controller
+injector_hyperfoil_agent_threads: 4
+injector_hyperfoil_target_protocol: https
+injector_hyperfoil_target_port: 443
+hyperfoil_version: 0.9

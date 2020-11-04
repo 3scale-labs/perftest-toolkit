@@ -1,2 +1,7 @@
-injector ansible_host=<injector_host> ansible_user=<injector-user>
 upstream ansible_host=<upstream-host> ansible_user=<upstream-user>
+
+[hyperfoil_controller]
+<hyperfoil-controller-host> ansible_host=<hyperfoil-controller-host> ansible_user=<ansible_user>
+
+[hyperfoil_agent]
+<hyperfoil-agent-host-01> ansible_host=<hyperfoil-agent-host-01> ansible_user=<ansible_user>

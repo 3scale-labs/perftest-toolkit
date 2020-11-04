@@ -1,0 +1,6 @@
+- src: hyperfoil.hyperfoil_setup
+  version: 0.9.1
+- src: hyperfoil.hyperfoil_shutdown
+  version: 0.9.1
+- src: hyperfoil.hyperfoil_test
+  version: 0.9.1

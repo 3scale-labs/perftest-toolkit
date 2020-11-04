@@ -1,8 +1,22 @@
 ---
-- hosts: injector
+- hosts: hyperfoil_controller
+  roles:
+    - hyperfoil.hyperfoil_test
+  vars:
+    test_name: 3scale-benchmark
+    test_files:
+      - "{{ csv_dest_file_path }}"
+    shared_connections: <SHARED_CONNECTIONS>
+    users_per_sec: <USERS_PER_SEC>
+    duration_sec: <DURATION_SEC>
+- hosts: hyperfoil_controller
   become: yes
+  roles:
+    - hyperfoil_generate_report
+- hosts: hyperfoil_controller
   tasks:
-    - name: run performace test
-      shell: /usr/local/bin/3scale-perftest -r <RPS> -d <DURATION> -t <THREADS>
-      register: out
-    - debug: var=out.stdout_lines
+    - name: Retrieve the report
+      fetch:
+        src: "{{ reports_path }}/index-{{ test_runid }}.html"
+        dest: "{{ playbook_dir }}/{{ toolkit_csv_file_path }}/"
+        flat: yes

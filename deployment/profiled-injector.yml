@@ -1,6 +1,23 @@
 ---
-- hosts: injector
+- hosts:
+    - hyperfoil_controller
+    - hyperfoil_agent
+  roles:
+    - platform-setup
   become: yes
+- hosts:
+    - hyperfoil_controller
   roles:
     - profiled-traffic-generator
-    - injector-configurator
+- hosts:
+    - hyperfoil_controller
+  roles:
+    - traffic-retriever
+- hosts:
+    - hyperfoil_controller
+    - hyperfoil_agent
+  roles:
+    - traffic-distributor
+- hosts: hyperfoil_controller
+  roles:
+    - injector-setup
