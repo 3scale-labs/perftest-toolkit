@@ -13,4 +13,4 @@ hyperfoil_controller_group: hyperfoil_controller
 injector_hyperfoil_agent_threads: 4
 injector_hyperfoil_target_protocol: https
 injector_hyperfoil_target_port: 443
-hyperfoil_version: 0.9
+hyperfoil_version: 0.11
