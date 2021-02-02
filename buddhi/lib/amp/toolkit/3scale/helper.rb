@@ -174,9 +174,13 @@ module AMP
           end
 
           wait do
-            pc_sandbox = client.proxy_config_latest(service.fetch('id'), 'sandbox')
-            if (errors = pc_sandbox['errors'])
-              raise "Proxy config not read: #{errors}"
+            pc_sandbox = nil
+            begin:
+              pc_sandbox = client.proxy_config_latest(service.fetch('id'), 'sandbox')
+              if (errors = pc_sandbox['errors'])
+                raise "Proxy config not read: #{errors}"
+              end
+            rescue ThreeScale::API::HttpClient::NotFoundError
             end
 
             if pc_sandbox.nil?
