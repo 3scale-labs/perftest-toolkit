@@ -39,6 +39,3 @@ DEPENDENCIES
   rake (~> 13.0)
   rspec (~> 3.5)
   rspec-collection_matchers
-
-BUNDLED WITH
-   1.17.3

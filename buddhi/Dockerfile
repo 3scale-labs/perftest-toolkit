@@ -1,16 +1,15 @@
-FROM centos/ruby-25-centos7:latest
+FROM ruby:2.7
 MAINTAINER Eguzki Astiz Lezaun <eastizle@redhat.com>
 
-USER root
-WORKDIR /opt/app-root/src
+WORKDIR /usr/src/app
 COPY . .
-RUN /bin/bash -l -c "gem build perftest-toolkit-buddhi.gemspec"
-RUN /bin/bash -l -c "gem install perftest-toolkit-buddhi-*.gem --no-document"
+RUN gem build perftest-toolkit-buddhi.gemspec
+RUN gem install perftest-toolkit-buddhi-*.gem --no-document
+RUN adduser --home /home/buddhiuser buddhiuser
+WORKDIR /home/buddhiuser
 
 # clean up
-RUN rm -rf /opt/app-root/src/*
+RUN rm -rf /usr/src/app
 
 # Drop privileges
-USER default
-
-ENTRYPOINT ["container-entrypoint", "perftest-toolkit-buddhi"]
+USER buddhiuser
