@@ -179,6 +179,13 @@ module AMP
               raise "Proxy config not read: #{errors}"
             end
 
+            if pc_sandbox.nil?
+              new_proxy_attrs = client.update_proxy service.fetch('id'), proxy_settings
+              if (errors = new_proxy_attrs['errors'])
+                raise "Proxy config not bumped: #{errors}"
+              end
+            end
+
             !pc_sandbox.nil?
           end
 
