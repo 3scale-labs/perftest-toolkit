@@ -1,4 +1,4 @@
-FROM ruby:2.7
+FROM quay.io/3scale/perftest-toolkit:ruby2.7
 MAINTAINER Eguzki Astiz Lezaun <eastizle@redhat.com>
 
 WORKDIR /usr/src/app
