@@ -21,4 +21,4 @@
     image: quay.io/hyperfoil/hyperfoil-report
     command: "bash -c \"/opt/report.sh /tmp/reports/{{ test_runid }}-all.json > /tmp/reports/index-{{ test_runid }}.html\""
     volumes:
-      - "{{ reports_path }}:/tmp/reports"
+      - "{{ reports_path }}:/tmp/reports:z"

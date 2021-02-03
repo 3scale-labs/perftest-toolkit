@@ -15,7 +15,7 @@
     image: quay.io/3scale/perftest-toolkit:master
     command: "perftest-toolkit-buddhi --portal {{ threescale_portal_endpoint }} --services \"{{ threescale_services }}\" -o /traffic/traffic.csv"
     volumes:
-      - "{{ tempdir_1.path }}:/traffic"
+      - "{{ tempdir_1.path }}:/traffic:z"
 
 - name: Copy traffic file
   copy:
