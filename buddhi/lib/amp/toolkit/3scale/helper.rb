@@ -160,40 +160,7 @@ module AMP
         end
 
         def self.bump_proxy_conf(client, service)
-          proxy_settings = {
-            # Adding harmless attribute to avoid empty body
-            # update_proxy cannot be done with empty body
-            # and must be done to increase proxy version
-            # If proxy settings have not been changed since last update,
-            # this request will not have effect and proxy config version will not be bumped.
-            service_id: service.fetch('id')
-          }
-          new_proxy_attrs = client.update_proxy service.fetch('id'), proxy_settings
-          if (errors = new_proxy_attrs['errors'])
-            raise "Proxy config not bumped: #{errors}"
-          end
-
-          wait do
-            pc_sandbox = nil
-            begin:
-              pc_sandbox = client.proxy_config_latest(service.fetch('id'), 'sandbox')
-              if (errors = pc_sandbox['errors'])
-                raise "Proxy config not read: #{errors}"
-              end
-            rescue ThreeScale::API::HttpClient::NotFoundError
-            end
-
-            if pc_sandbox.nil?
-              new_proxy_attrs = client.update_proxy service.fetch('id'), proxy_settings
-              if (errors = new_proxy_attrs['errors'])
-                raise "Proxy config not bumped: #{errors}"
-              end
-            end
-
-            !pc_sandbox.nil?
-          end
-
-          new_proxy_attrs
+          client.proxy_deploy service.fetch('id')
         end
 
         def self.promote_proxy_conf(client, service)
