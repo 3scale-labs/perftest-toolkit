@@ -23,7 +23,7 @@ module AMP
           LIMITS_PER_PRODUCT = 10
           THREADS_N = Integer(ENV.fetch("THREADS_N", "10"))
 
-          def self.call(portal, endpoint)
+          def self.call(portal, private_base_url, public_base_url)
             client = ThreeScale.client(portal)
             account = ThreeScale::Helper.create_account(client)
             services = Concurrent::Array.new
@@ -34,9 +34,9 @@ module AMP
 
             # threads array
             threads = thread_tasks.map do |n_tasks|
-              Thread.new(account, endpoint, services, n_tasks) do |acc, endp, s_list, n|
+              Thread.new(account, private_base_url, public_base_url, services, n_tasks) do |acc, priv_url, pub_url, s_list, n|
                 n.times do
-                  standard = Standard.new(portal, endp, acc)
+                  standard = Standard.new(portal, priv_url, pub_url, acc)
                   standard.run
                   s_list << standard.service_id
                 end
@@ -49,12 +49,13 @@ module AMP
             services
           end
 
-          attr_reader :client, :account, :service, :endpoint
+          attr_reader :client, :account, :service, :private_base_url, :public_base_url
 
-          def initialize(portal, endpoint, account)
+          def initialize(portal, private_base_url, public_base_url, account)
             @client = ThreeScale.client(portal)
-            @endpoint = endpoint
-            @service = ThreeScale::Helper.create_service(client)
+            @private_base_url = private_base_url
+            @public_base_url = public_base_url
+            @service = ThreeScale::Helper.create_service(client, public_base_url)
             @account = account
           end
 
@@ -63,6 +64,7 @@ module AMP
           end
 
           def run
+            ThreeScale::Helper.update_service_proxy(client, service, public_base_url)
             ThreeScale::Helper.delete_mapping_rules(client, service)
             plan = ThreeScale::Helper.create_application_plan(client, service)
 
@@ -73,7 +75,7 @@ module AMP
             backends = nil
             begin
               backends = Array.new(BACKEND_PER_SVC_N) do |backend_idx|
-                new_backend(client, endpoint, service, backend_idx)
+                new_backend(client, private_base_url, service, backend_idx)
               end
             rescue ::ThreeScale::API::HttpClient::ForbiddenError
               raise 'Provider account does not support backend profile. ' \
@@ -94,8 +96,8 @@ module AMP
 
           private
 
-          def new_backend(client, endpoint, service, backend_idx)
-            backend = ThreeScale::Helper.create_backend(client, endpoint)
+          def new_backend(client, private_base_url, service, backend_idx)
+            backend = ThreeScale::Helper.create_backend(client, private_base_url)
             ThreeScale::Helper.create_backend_usage(client, service, backend, format('/v%04d', backend_idx))
             METHODS_PER_BACKEND_N.times do |method_idx|
               backend_method = ThreeScale::Helper.create_backend_method(client, backend)
@@ -106,7 +108,7 @@ module AMP
           end
         end
 
-        Register.register_profile(:standard) { |portal, endpoint| Standard.call(portal, endpoint) }
+        Register.register_profile(:standard) { |portal, private_base_url, public_base_url| Standard.call(portal, private_base_url, public_base_url) }
       end
     end
   end

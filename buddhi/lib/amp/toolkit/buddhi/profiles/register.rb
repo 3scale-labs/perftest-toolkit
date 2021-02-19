@@ -12,9 +12,9 @@ module AMP
             @profiles.keys
           end
 
-          def self.call(profile:, portal:, endpoint:, **_options)
+          def self.call(profile:, portal:, private_base_url:, public_base_url:, **_options)
             # profile is a valid
-            @profiles[profile.to_sym].call(portal, endpoint)
+            @profiles[profile.to_sym].call(portal, private_base_url, public_base_url)
           end
         end
       end

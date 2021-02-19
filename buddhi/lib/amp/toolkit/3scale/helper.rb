@@ -16,10 +16,16 @@ module AMP
           uri_obj
         end
 
-        def self.create_service(client)
+        def self.create_service(client, public_base_url)
           service_name = "PERF_TEST_#{random_lowercase_name}"
           system_name = service_name.delete("\s").downcase
-          svc_params = { 'name' => service_name, 'system_name' => system_name }
+          deployment_option = if public_base_url.nil?
+                                'hosted'
+                              else
+                                'self_managed'
+                              end
+          svc_params = { 'name' => service_name, 'system_name' => system_name,
+                         'deployment_option' => deployment_option }
           svc_obj = client.create_service svc_params
 
           if (errors = svc_obj['errors'])
@@ -131,10 +137,10 @@ module AMP
           account_obj
         end
 
-        def self.create_backend(client, endpoint)
+        def self.create_backend(client, private_base_url)
           attrs = {
             name: random_lowercase_name,
-            private_endpoint: endpoint,
+            private_endpoint: private_base_url,
           }
 
           backend_obj = client.create_backend(attrs)
@@ -157,6 +163,22 @@ module AMP
           end
 
           backend_usage_obj
+        end
+
+        def self.update_service_proxy(client, service, public_base_url)
+          proxy = { 'endpoint' => public_base_url }
+
+          proxy.compact!
+
+          unless proxy.empty?
+            new_proxy_attrs = client.update_proxy service.fetch('id'), proxy
+
+            if (errors = new_proxy_attrs['errors'])
+              raise "Service proxy not updated: #{errors}"
+            end
+
+            new_proxy_attrs
+          end
         end
 
         def self.bump_proxy_conf(client, service)
@@ -225,8 +247,8 @@ module AMP
           method_obj
         end
 
-        def self.update_private_endpoint(client, service, endpoint)
-          proxy = { api_backend: endpoint }
+        def self.update_private_endpoint(client, service, private_base_url)
+          proxy = { api_backend: private_base_url }
           new_proxy_attrs = client.update_proxy service.fetch('id'), proxy
 
           if (errors = new_proxy_attrs['errors'])
