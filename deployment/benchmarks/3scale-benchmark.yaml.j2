@@ -5,7 +5,7 @@ agents:
 {% endfor %}
 http:
 {% for host in groups[injector_target_group] %}
-- host: {{ injector_hyperfoil_target_protocol }}://{{ host }}
+- host: {{ injector_hyperfoil_target_protocol }}://{{ host }}:{{ injector_hyperfoil_target_port }}
   sharedConnections: {{ shared_connections }}
 {% endfor %}
 usersPerSec: {{ users_per_sec }}
