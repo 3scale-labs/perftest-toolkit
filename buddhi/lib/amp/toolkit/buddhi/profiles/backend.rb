@@ -18,15 +18,16 @@ module AMP
         # # 1 Method per backend
         # # 1 MappingRule per backend
         class Backend
-          def self.call(portal, endpoint)
+          def self.call(portal, private_base_url, public_base_url)
             client = ThreeScale.client(portal)
-            service = ThreeScale::Helper.create_service(client)
+            service = ThreeScale::Helper.create_service(client, public_base_url)
+            ThreeScale::Helper.update_service_proxy(client, service, public_base_url)
             plan = ThreeScale::Helper.create_application_plan(client, service)
             account = ThreeScale::Helper.account(client)
             ThreeScale::Helper.create_application(client, plan, account)
             ThreeScale::Helper.delete_mapping_rules(client, service)
             begin
-              backend = ThreeScale::Helper.create_backend(client, endpoint)
+              backend = ThreeScale::Helper.create_backend(client, private_base_url)
               ThreeScale::Helper.create_backend_usage(client, service, backend, '/')
               backend_method = ThreeScale::Helper.create_backend_method(client, backend)
               ThreeScale::Helper.create_application_plan_limit(client, service, plan, backend_method.fetch('id'))
@@ -41,7 +42,7 @@ module AMP
           end
         end
 
-        Register.register_profile(:backend) { |portal, endpoint| Backend.call(portal, endpoint) }
+        Register.register_profile(:backend) { |portal, private_base_url, public_base_url| Backend.call(portal, private_base_url, public_base_url) }
       end
     end
   end

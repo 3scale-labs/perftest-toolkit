@@ -7,7 +7,8 @@ module AMP
           options.banner = 'usage: buddhi [options]'
           options.string '-P', '--portal', 'Admin portal endpoint', required: true
           options.string '-s', '--services', '3scale service list'
-          options.string '-e', '--endpoint', 'API upstream endpoint'
+          options.string '-e', '--private-base-url', 'Private base URL'
+          options.string '-b', '--public-base-url', 'Public base URL'
           options.string '-p', '--profile', "3scale product profile. Valid profiles #{Profiles::Register.profile_keys.map(&:to_s)}" do |profile|
             unless Profiles::Register.profile_keys.include? profile.to_sym
               raise Slop::Error, "Invalid profile: #{profile}"
@@ -56,8 +57,8 @@ module AMP
 
            raise Slop::Error, 'admin portal not valid' unless Factory.validate_portal pargs.fetch(:portal)
 
-           # if profile specified, endpoint is required
-           raise Slop::Error, 'endpoint is required' if !pargs.fetch(:profile).nil? && pargs.fetch(:endpoint).nil?
+           # if profile specified, private-base-url is required
+           raise Slop::Error, 'private-base-url is required' if !pargs.fetch(:profile).nil? && pargs.fetch(:private_base_url).nil?
         end
       end
     end

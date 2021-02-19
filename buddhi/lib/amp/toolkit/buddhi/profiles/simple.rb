@@ -18,9 +18,10 @@ module AMP
         # # 0 Method per backend
         # # 0 MappingRule per backend
         class Simple
-          def self.call(portal, endpoint)
+          def self.call(portal, private_base_url, public_base_url)
             client = ThreeScale.client(portal)
-            service = ThreeScale::Helper.create_service(client)
+            service = ThreeScale::Helper.create_service(client, public_base_url)
+            ThreeScale::Helper.update_service_proxy(client, service, public_base_url)
             plan = ThreeScale::Helper.create_application_plan(client, service)
             hits_metric_obj = ThreeScale::Helper.hits_metric(client, service)
             ThreeScale::Helper.create_application_plan_limit(client, service, plan, hits_metric_obj.fetch('id'))
@@ -29,11 +30,11 @@ module AMP
             account = ThreeScale::Helper.account(client)
             ThreeScale::Helper.create_application(client, plan, account)
             begin
-              backend = ThreeScale::Helper.create_backend(client, endpoint)
+              backend = ThreeScale::Helper.create_backend(client, private_base_url)
               ThreeScale::Helper.create_backend_usage(client, service, backend, '/')
             rescue ::ThreeScale::API::HttpClient::ForbiddenError, ::ThreeScale::API::HttpClient::NotFoundError
               # 3scale Backends not supported
-              ThreeScale::Helper.update_private_endpoint(client, service, endpoint)
+              ThreeScale::Helper.update_private_endpoint(client, service, private_base_url)
             end
             ThreeScale::Helper.bump_proxy_conf(client, service)
             ThreeScale::Helper.promote_proxy_conf(client, service)
@@ -41,7 +42,7 @@ module AMP
           end
         end
 
-        Register.register_profile(:simple) { |portal, endpoint| Simple.call(portal, endpoint) }
+        Register.register_profile(:simple) { |portal, private_base_url, public_base_url| Simple.call(portal, private_base_url, public_base_url) }
       end
     end
   end
