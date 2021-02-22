@@ -33,12 +33,14 @@ module AMP
             thread_tasks[0, SERVICES_N%THREADS_N] = thread_tasks[0, SERVICES_N%THREADS_N].map { |x| x + 1 }
 
             # threads array
-            threads = thread_tasks.map do |n_tasks|
-              Thread.new(account, private_base_url, public_base_url, services, n_tasks) do |acc, priv_url, pub_url, s_list, n|
+            threads = thread_tasks.each_with_index.map do |n_tasks, idx|
+              Thread.new(idx, account, private_base_url, public_base_url, services, n_tasks) do |i, acc, priv_url, pub_url, s_list, n|
                 n.times do
-                  standard = Standard.new(portal, priv_url, pub_url, acc)
+                  standard = Standard.new(i, portal, priv_url, pub_url, acc)
                   standard.run
                   s_list << standard.service_id
+                rescue => e
+                  STDERR.puts e
                 end
               end
             end
@@ -49,9 +51,10 @@ module AMP
             services
           end
 
-          attr_reader :client, :account, :service, :private_base_url, :public_base_url
+          attr_reader :client, :account, :service, :private_base_url, :public_base_url, :idx
 
-          def initialize(portal, private_base_url, public_base_url, account)
+          def initialize(idx, portal, private_base_url, public_base_url, account)
+            @idx = idx
             @client = ThreeScale.client(portal)
             @private_base_url = private_base_url
             @public_base_url = public_base_url
@@ -98,7 +101,7 @@ module AMP
 
           def new_backend(client, private_base_url, service, backend_idx)
             backend = ThreeScale::Helper.create_backend(client, private_base_url)
-            ThreeScale::Helper.create_backend_usage(client, service, backend, format('/v%04d', backend_idx))
+            ThreeScale::Helper.create_backend_usage(client, service, backend, "/v#{idx}/#{format('v%04d', backend_idx)}")
             METHODS_PER_BACKEND_N.times do |method_idx|
               backend_method = ThreeScale::Helper.create_backend_method(client, backend)
               ThreeScale::Helper.create_backend_mapping_rule(client, backend, backend_method, format('/v%04d', method_idx))
