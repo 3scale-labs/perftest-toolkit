@@ -5,7 +5,7 @@ module AMP
       # Input param can be endpoint url or remote name
       #
       def self.client(portal_url)
-        remote_client(remote(portal_url))
+        remote_client(**remote(portal_url))
       end
 
       def self.remote(uri_str)

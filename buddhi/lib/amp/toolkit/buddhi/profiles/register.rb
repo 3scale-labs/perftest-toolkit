@@ -12,10 +12,10 @@ module AMP
             @profiles.keys
           end
 
-          def self.call(profile:, portal:, private_base_url:, public_base_url:, **_options)
+          def self.call(profile:, public_base_url:, **options)
             public_base_url = nil if !public_base_url.nil? && public_base_url.empty?
-            # profile is a valid
-            @profiles[profile.to_sym].call(portal, private_base_url, public_base_url)
+            # profile is valid
+            @profiles[profile.to_sym].call(public_base_url: public_base_url, **options)
           end
         end
       end

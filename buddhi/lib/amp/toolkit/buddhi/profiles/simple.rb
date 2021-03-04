@@ -18,7 +18,7 @@ module AMP
         # # 0 Method per backend
         # # 0 MappingRule per backend
         class Simple
-          def self.call(portal, private_base_url, public_base_url)
+          def self.call(portal:, private_base_url:, public_base_url:, **_opts)
             client = ThreeScale.client(portal)
             service = ThreeScale::Helper.create_service(client, public_base_url)
             ThreeScale::Helper.update_service_proxy(client, service, public_base_url)
@@ -42,7 +42,7 @@ module AMP
           end
         end
 
-        Register.register_profile(:simple) { |portal, private_base_url, public_base_url| Simple.call(portal, private_base_url, public_base_url) }
+        Register.register_profile(:simple) { |**opts| Simple.call(**opts) }
       end
     end
   end
