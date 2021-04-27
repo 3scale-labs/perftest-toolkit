@@ -184,7 +184,7 @@ agenthost02.example.com ansible_host=agenthost02.example.com ansible_role=root
 * `threescale_portal_endpoint`: 3scale portal endpoint
 * `traffic_profile`: Currently [available profiles](buddhi/README.md#profiles): `simple, backend, standard`
 * `private_base_url`: Private Base URL used for the tests. Make sure your private application behaves like an echo api service.
-* `public_base_url`: Optionally, configure the `Public Base URL` used for the tests for self managed apicast environments.
+* `public_base_url`: Optionally, configure the `Public Base URL` used for the tests for self managed apicast environments. Otherwise, leave it empty.
 
 ```
 File: roles/traffic-configurator/defaults/main.yml
@@ -209,7 +209,7 @@ private_base_url: <PRIVATE_BASE_URL>
 
 # Public Base URL
 # Public address of your API gateway in the production environment.
-# Optional. The default public base url will be the hosted gateway url
+# Optional. When it is left empty, public base url will be the hosted gateway url
 # example: https://gw.example.com:443
 public_base_url: <PUBLIC_BASE_URL>
 ```

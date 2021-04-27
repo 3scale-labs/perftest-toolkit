@@ -6,19 +6,7 @@
     path: "{{ reports_path }}"
     recurse: yes
     mode: '0755'
-- name: Retrieve the run data
+- name: Retrieve the report
   get_url:
-    url: "http://{{ hyperfoil_controller_host }}:{{ hyperfoil_controller_port }}/run/{{ test_runid }}/stats/all"
-    headers:
-      Accept: 'application/json'
-    dest: "{{ reports_path }}/{{ test_runid }}-all.json"
-- name: Creates hyperfoil report
-  docker_container:
-    name: hyperfoil_report
-    state: started
-    tty: True
-    detach: no
-    image: quay.io/hyperfoil/hyperfoil-report
-    command: "bash -c \"/opt/report.sh /tmp/reports/{{ test_runid }}-all.json > /tmp/reports/index-{{ test_runid }}.html\""
-    volumes:
-      - "{{ reports_path }}:/tmp/reports:z"
+    url: "http://{{ hyperfoil_controller_host }}:{{ hyperfoil_controller_port }}/run/{{ test_runid }}/report"
+    dest: "{{ reports_path }}/{{ test_runid }}.html"
