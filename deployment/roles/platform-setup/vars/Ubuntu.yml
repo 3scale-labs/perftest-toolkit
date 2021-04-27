@@ -1,5 +1,5 @@
 ---
 java_package:
-  - openjdk-8-jre-headless
+  - openjdk-11-jre
 unzip_package:
   - unzip

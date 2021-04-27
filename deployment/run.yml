@@ -17,6 +17,6 @@
   tasks:
     - name: Retrieve the report
       fetch:
-        src: "{{ reports_path }}/index-{{ test_runid }}.html"
+        src: "{{ reports_path }}/{{ test_runid }}.html"
         dest: "{{ playbook_dir }}/{{ toolkit_csv_file_path }}/"
         flat: yes

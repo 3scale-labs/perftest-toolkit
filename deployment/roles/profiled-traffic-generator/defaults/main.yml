@@ -21,6 +21,6 @@ private_base_url: <PRIVATE_BASE_URL>
 
 # Public Base URL
 # Public address of your API gateway in the production environment.
-# Optional. The default public base url will be the hosted gateway url
+# Optional. When it is left empty, public base url will be the hosted gateway url
 # example: https://gw.example.com:443
 public_base_url: <PUBLIC_BASE_URL>
