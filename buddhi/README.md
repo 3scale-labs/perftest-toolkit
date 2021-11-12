@@ -15,12 +15,12 @@ $ cat traffic.csv
 ## Usage
 
 ```shell
-docker run --rm quay.io/3scale/perftest-toolkit:master -h
+docker run --rm quay.io/3scale/perftest-toolkit:v2.4.0 -h
 usage: buddhi [options]
     -P, --portal    Admin portal endpoint
     -s, --services  3scale service list
     -e, --endpoint  API upstream endpoint
-    -p, --profile   3scale product profile. Valid profiles ["simple", "backend", "standard"]
+    -p, --profile   3scale product profile. Valid profiles ["simple", "backend", "medium", "standard"]
     -o, --output    output file
     -h, --help
     -v, --version   print the version
@@ -29,7 +29,7 @@ usage: buddhi [options]
 `--services` and `--profile` are mutually exclusive options.
 
 * If `--services` is provided, the tool will inspect those services and generate traffic tool from them.
-* If `--profile` is provided, the tool will create a 3scale product with the given profile. Currently valid profiles are `simple, backend, standard`. `--profile` option requires `--endpoint` option to be provided.
+* If `--profile` is provided, the tool will create a 3scale product with the given profile. Currently valid profiles are `simple, backend, medium, standard`. `--profile` option requires `--endpoint` option to be provided.
 
 ### Profiles
 
