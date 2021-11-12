@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.0] - 2020-10-15
+
+### Added
+
+- Added Medium profile [PR #72](https://github.com/3scale/perftest-toolkit/pull/72)
+- Hyperfoil 0.15.0 [PR #34](https://github.com/3scale/perftest-toolkit/pull/34)
+- Traffic profiles with self-managed deployment option [PR #67](https://github.com/3scale/perftest-toolkit/pull/67)
+
 ## [2.2.2] - 2020-10-15
 
 ### Fixed
