@@ -21,6 +21,7 @@ module AMP
           opts[:backend_per_svc_n] = 5
           opts[:methods_per_backend_n] = 10
           opts[:limits_per_product] = 10
+
           MultiService.call(**opts)
         end
       end

@@ -182,7 +182,7 @@ agenthost02.example.com ansible_host=agenthost02.example.com ansible_role=root
 
 **2.** Configure the following settings in `roles/profiled-traffic-generator/defaults/main.yml` file:
 * `threescale_portal_endpoint`: 3scale portal endpoint
-* `traffic_profile`: Currently [available profiles](buddhi/README.md#profiles): `simple, backend, standard`
+* `traffic_profile`: Currently [available profiles](buddhi/README.md#profiles): `simple, backend, medium, standard`
 * `private_base_url`: Private Base URL used for the tests. Make sure your private application behaves like an echo api service.
 * `public_base_url`: Optionally, configure the `Public Base URL` used for the tests for self managed apicast environments. Otherwise, leave it empty.
 
@@ -199,7 +199,7 @@ threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
 # It is synthetically generated traffic based on traffic models.
 # Information about available traffic profiles (or test plans) can be found here:
 # https://github.com/3scale/perftest-toolkit/blob/master/buddhi/README.md#profiles
-# Currently available profiles: [ simple | backend | standard ]
+# Currently available profiles: [ simple | backend | medium | standard ]
 traffic_profile: <TRAFFIC_PROFILE>
 
 # Private Base URL

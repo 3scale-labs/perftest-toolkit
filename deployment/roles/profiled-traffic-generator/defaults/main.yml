@@ -11,7 +11,7 @@ threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
 # It is synthetically generated traffic based on traffic models.
 # Information about available traffic profiles (or test plans) can be found here:
 # https://github.com/3scale/perftest-toolkit/blob/master/buddhi/README.md#profiles
-# Currently available profiles: [ simple | backend | standard ]
+# Currently available profiles: [ simple | backend | medium | standard ]
 traffic_profile: <TRAFFIC_PROFILE>
 
 # Private Base URL
