@@ -32,4 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'concurrent-ruby', '~> 1.1'
   spec.add_dependency '3scale-api', '~> 1.4'
   spec.add_dependency 'slop', '~> 4.4'
+  spec.required_ruby_version = '>= 2.7'
 end

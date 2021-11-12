@@ -2,7 +2,7 @@ module AMP
   module Toolkit
     module Buddhi
       class Factory
-        def self.call(portal:, services:, output:, **_options)
+        def self.call(portal:, services:, output:, **_opts)
           client = ThreeScale.client(portal)
           File.open(output, 'w') do |file|
             service_ary(client, services).each do |service_id|

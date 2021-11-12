@@ -48,6 +48,17 @@ usage: buddhi [options]
   * One backend 
     * One method
     * One mapping rule (for the previous method)
+* The *medium* profile defines: 
+  * 1 Account
+    * 500 Applications
+  * 10 products
+    * 1 application plan per product
+    * 10 application plan limits per product
+    * 50 application per plan
+    * 5 backend usages per product
+  * 50 backend (each product will be using 5 backends)
+    * 10 methods
+    * 10 mapping rules
 * The **standard** profile defines: 
   * 1 Account
     * 10000 Applications
