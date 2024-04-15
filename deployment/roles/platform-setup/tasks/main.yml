@@ -9,7 +9,7 @@
   package:
     name: "{{ java_package }}"
     state: present
-- name: Intall unzip
+- name: Install unzip
   package:
     name: "{{ unzip_package }}"
     state: present
