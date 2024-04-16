@@ -1,5 +1,5 @@
 ---
 java_package:
-  - java-latest-openjdk
+  - java-11-openjdk
 unzip_package:
   - unzip
