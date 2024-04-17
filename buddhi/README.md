@@ -48,7 +48,7 @@ usage: buddhi [options]
   * One backend 
     * One method
     * One mapping rule (for the previous method)
-* The *medium* profile defines: 
+* The **medium** profile defines: 
   * 1 Account
     * 500 Applications
   * 10 products
