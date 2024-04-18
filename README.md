@@ -2,7 +2,7 @@
 
 [![Docker Repository on Quay](https://quay.io/repository/3scale/perftest-toolkit/status "Docker Repository on Quay")](https://quay.io/repository/3scale/perftest-toolkit)
 
-This repo has tools and deployment configs for a performance testing environment to be able to run performance tests of a 3scale API Management solution, focussing on the traffic intensive parts of the solution (the API Gateway and the Service Management API).
+This repo has tools and deployment configs for a performance testing environment to be able to run performance tests of a 3scale API Management solution, focusing on the traffic intensive parts of the solution (the API Gateway and the Service Management API).
 
 We have open sourced it to enable partners, customers and support engineers to run their own performance tests on "self-managed" (i.e. Not SaaS) installations of the 3scale API Management solution.
 
@@ -65,32 +65,16 @@ Make sure that the injector host’s hardware resources is not the performance t
 
 ### Common settings
 
-** HTTP/HTTPS **
-
-By default, the injector will generate HTTPS traffic on the port number 443.
-You can change this setting editing *injector_hyperfoil_target_protocol* and *injector_hyperfoil_target_port* parameters.
+**1.** Provide **hyperfoil controller** host IP address or DNS name and at least one **hyperfoil agent** host IP address or DNS name to the [deployment/hosts](deployment/hosts) file. For example:
 
 ```
-File: group_vars/all.yml
-
-injector_hyperfoil_target_protocol: https
-injector_hyperfoil_target_port: 443
-```
-
-### Test your 3scale services
-
-**Steps**:
-
-**1.** Provide **hyperfoil controller** host IP address or DNS name and at least one **hyperfoil agent** host IP address or DNS name. For example:
-
-```
-File: hosts
+upstream ansible_host=controllerhost.example.com ansible_user=root
 
 [hyperfoil_controller]
-controllerhost.example.com ansible_host=controllerhost.example.com ansible_role=root
+controllerhost.example.com ansible_host=controllerhost.example.com ansible_user=root
 
 [hyperfoil_agent]
-agenthost.example.com ansible_host=agenthost.example.com ansible_role=root
+agent1 ansible_host=agenthost.example.com ansible_user=root
 ```
 
 **Note 01**: make sure defined ansible user has ssh login access to the host without password.
@@ -100,22 +84,31 @@ agenthost.example.com ansible_host=agenthost.example.com ansible_role=root
 More than one hyperfoil agent can be configured. Useful when the injector becomes a bottleneck. For example to configure two agents:
 
 ```
-File: hosts
+upstream ansible_host=controllerhost.example.com ansible_user=root
 
 [hyperfoil_controller]
-controllerhost.example.com ansible_host=controllerhost.example.com ansible_role=root
+controllerhost.example.com ansible_host=controllerhost.example.com  ansible_user=root
 
 [hyperfoil_agent]
-agenthost01.example.com ansible_host=agenthost01.example.com ansible_role=root
-agenthost02.example.com ansible_host=agenthost02.example.com ansible_role=root
+agent1 ansible_host=agenthost01.example.com ansible_role=root
+agent2 ansible_host=agenthost02.example.com ansible_role=root
 ```
 
-**2.** Configure the following settings in `roles/user-traffic-reader/defaults/main.yml` file:
+**2.** By default, the injector will generate HTTPS traffic on the port number 443. You can change this setting editing the `injector_hyperfoil_target_protocol` and `injector_hyperfoil_target_port` parameters in the [deployment/group_vars/all.yml](deployment/group_vars/all.yml) file.
+
+**3.** If you're having ssh issues when running ansible playbooks, try adding an ssh certificate to [deployment/ansible.cfg](deployment/ansible.cfg). Otherwise, remove the `-i "/path/to/ssh/certificate"` from this [line](https://github.com/3scale-labs/perftest-toolkit/blob/c906ca3349a34d9fe6e72d9b28570268387257fd/deployment/ansible.cfg#L11).
+
+### Test your 3scale services
+
+Skip these steps if using traffic profiles. These steps will configure the injector to use your 3scale services.
+
+**1.** Configure the following settings in [deployment/roles/user-traffic-reader/defaults/main.yml](deployment/roles/user-traffic-reader/defaults/main.yml) file:
 * `threescale_portal_endpoint`: 3scale portal endpoint
 * `threescale_services`: Select the 3scale services you want to use for the tests. Leave it empty to use them all.
 
 ```
-File: roles/user-traffic-reader/defaults/main.yml
+---
+# defaults file for user-traffic-reader
 
 # URI that includes your password and portal endpoint in the following format: <schema>://<password>@<admin-portal-domain>.
 # The <password> can be either the provider key or an access token for the 3scale Account Management API.
@@ -128,19 +121,7 @@ threescale_portal_endpoint: <THREESCALE_PORTAL_ENDPOINT>
 threescale_services: ""
 ```
 
-**3.** Execute the playbook `injector.yml` to deploy injector.
-
-Avoid ssh issues when running anisble playbooks
-
-```bash
-$ cat ~/.ansible.cfg
-[ssh_connection]
-ssh_args = -o ServerAliveInterval=30
-pipelining = True
-```
-
-Start the playbook
-
+**2.** Execute the playbook `injector.yml` to deploy injector.
 ```bash
 cd deployment/
 ansible-playbook -i hosts injector.yml
@@ -148,46 +129,17 @@ ansible-playbook -i hosts injector.yml
 
 ### Setup traffic profiles
 
-Skip these steps if testing your own 3scale services. This steps will setup 3scale services for performance testing.
+Skip these steps if testing your own 3scale services. These steps will set up 3scale services for performance testing.
 
-**Steps**:
-
-**1.** Provide **hyperfoil controller** host IP address or DNS name and at least one **hyperfoil agent** host IP address or DNS name. For example:
-
-```
-File: hosts
-
-[hyperfoil_controller]
-controllerhost.example.com ansible_host=controllerhost.example.com ansible_role=root
-
-[hyperfoil_agent]
-agenthost.example.com ansible_host=agenthost.example.com ansible_role=root
-```
-
-**Note 01**: make sure defined ansible user has ssh login access to the host without password.
-**Note 02**: make sure hyperfoil controller host has ssh login access to the agent host without password.
-
-More than one hyperfoil agent can be configured. Useful when the injector becomes a bottleneck. For example to configure two agents:
-
-```
-File: hosts
-
-[hyperfoil_controller]
-controllerhost.example.com ansible_host=controllerhost.example.com ansible_role=root
-
-[hyperfoil_agent]
-agenthost01.example.com ansible_host=agenthost01.example.com ansible_role=root
-agenthost02.example.com ansible_host=agenthost02.example.com ansible_role=root
-```
-
-**2.** Configure the following settings in `roles/profiled-traffic-generator/defaults/main.yml` file:
+**1.** Configure the following settings in [deployment/roles/profiled-traffic-generator/defaults/main.yml](deployment/roles/profiled-traffic-generator/defaults/main.yml):
 * `threescale_portal_endpoint`: 3scale portal endpoint
 * `traffic_profile`: Currently [available profiles](buddhi/README.md#profiles): `simple, backend, medium, standard`
 * `private_base_url`: Private Base URL used for the tests. Make sure your private application behaves like an echo api service.
-* `public_base_url`: Optionally, configure the `Public Base URL` used for the tests for self managed apicast environments. Otherwise, leave it empty.
+* `public_base_url`: Optionally, configure the `Public Base URL` used for the tests for self-managed apicast environments. Otherwise, leave it empty.
 
 ```
-File: roles/traffic-configurator/defaults/main.yml
+---
+# defaults file for profiled-traffic-generator
 
 # URI that includes your password and portal endpoint in the following format: <schema>://<password>@<admin-portal-domain>.
 # The <password> can be either the provider key or an access token for the 3scale Account Management API.
@@ -214,31 +166,17 @@ private_base_url: <PRIVATE_BASE_URL>
 public_base_url: <PUBLIC_BASE_URL>
 ```
 
-**3.** Execute the playbook `profiled-injector.yml` to deploy injector.
-
-Avoid ssh issues when running anisble playbooks
-
+**2.** Execute the playbook `profiled-injector.yml` to deploy injector.
 ```bash
-$ cat ~/.ansible.cfg
-[ssh_connection]
-ssh_args = -o ServerAliveInterval=30
-pipelining = True
-```
-
-Start the playbook
-
-```bash
+cd deployment/
 ansible-playbook -i hosts profiled-injector.yml
-
 ```
 
 ## Run tests
 
-**1.** Configure testing settings:
+**1.** Configure testing settings in [deployment/run/yml](https://github.com/3scale-labs/perftest-toolkit/blob/c906ca3349a34d9fe6e72d9b28570268387257fd/deployment/run.yml#L9-L11):
 
 ```
-File: run.yml
-
 USERS_PER_SEC: Requests per second
 DURATION_SEC: Duration of the performance test in seconds
 SHARED_CONNECTIONS: Number of connections open per target HOST
@@ -252,7 +190,7 @@ ansible-playbook -i hosts -i benchmarks/3scale.csv run.yml
 
 **3.** View Report
 
-The test results of the last execution are automatically stored in **deployment/benchmarks/index-<runid>.html**.
+The test results of the last execution are automatically stored in **deployment/benchmarks/<runid>.html**.
 The html file can be directly opened with your favorite web browser.
 
 ## Sustained load
@@ -302,25 +240,28 @@ If accesslog shows *could not find service for host* error, then the configured 
 ```
 2018/06/05 13:32:41 [warn] 25#25: *883 [lua] errors.lua:43: get_upstream(): could not find service for host: 9ccd143c-dbe4-471c-9bce-41df7dde8d99.benchmark.perftest.3sca.net, client: 10.130.4.1, server: _, request: "GET /855aaf5c-a199-4145-a3ab-ea9402cc35db/some-request?user_key=32313d20d99780a5 HTTP/1.1", host: "9ccd143c-dbe4-471c-9bce-41df7dde8d99.benchmark.perftest.3sca.net"
 ```
-Another issue might be when response codes are *404 Not Found*.Then proxy-rules do not match traffic path.
 
-In anyone of the previous cases, it seems that *apicast gateway* does not have latest configuration.
-Pods restart is required or wait until process fetches new configuration based on
+Another issue might be when response codes are *404 Not Found*. Then proxy-rules do not match traffic path.
+
+In anyone of the previous cases, it seems that *apicast gateway* does not have the latest configuration.
+Either restart the pod(s) or wait until process fetches the new configuration based on
 *APICAST_CONFIGURATION_CACHE* apicast configuration parameter.
 
-Restart is easily done downscaling to 0 and then scaling back to desired number of pods.
+The pods can be restarted by scaling the Deployment to 0 and then scaling back to the desired number of pods.
 
 ```bash
-$ oc scale dc apicast-production --replicas=0
-$ oc scale dc apicast-production --replicas=2
+oc scale deployment apicast-production --replicas=0
+oc scale deployment apicast-production --replicas=2
 ```
 
 ### Check backend listener traffic
 
 First, scale down *backend-listener* service to just one pod.
+```bash
+oc scale deployment backend-listener --replicas=1
+```
 
-Monitor pod's logs for traffic accesslog.
-
+Then monitor the pod's logs for traffic accesslog.
 ```bash
 oc logs -f backend-listener-X-podId
 ```
@@ -339,5 +280,4 @@ If logs are shown, check response codes on accesslog. Other than *200 OK* means
 When *backend-listener* accesslog shows requests are being answered with *200 OK* response codes,
 the last usual suspect is upstream or upstream configuration.
 
-Check *upstream* uri is correctly configured in your 3scale configuration
-
+Check *upstream* uri is correctly configured in your 3scale configuration.
