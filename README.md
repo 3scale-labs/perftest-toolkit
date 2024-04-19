@@ -13,6 +13,7 @@ The goal is to help to resolve doubts or issues related to scalability or perfor
 ## Table of Contents
 
 * [High level overview](#high-level-overview)
+* [Prerequisites](#prerequisites)
 * [Deploy injector](#deploy-injector)
    * [Common settings](#common-settings)
    * [Test your 3scale services](#test-your-3scale-services)
@@ -36,6 +37,16 @@ High level overview is quite simple. Main components are represented in the diag
 * Test Configurator (Buddhi): 3scale setup and traffic generation tool
 
 ![Test setup](deployment/doc/infrastructure.png "Infrastructure")
+
+## Prerequisites
+* An OpenShift cluster with 3scale installed. You can also use the OpenShift cluster to host your Upstream API (or you can host it elsewhere).
+* A machine to run the hyperfoil injector (for example, an AWS EC2 Instance). Keep in mind this machine will be running performance tests so make sure it has sufficient compute resources to not be the bottleneck.
+  * This machine can serve as both the control node and the managed node for the injector _**or**_ it can just be the managed node. For example, you could use your local machine as the injector's control node and the remote machine as the injector's managed node.
+
+The perftest-toolkit will take care of:
+* Installing hyperfoil on the remote machine (e.g. the AWS EC2 instance)
+* Running [Buddhi](buddhi/README.md)
+* Creating 3scale products, backends, etc. (**only** if using [traffic profiles](buddhi/README.md#profiles))
 
 ## Deploy injector
 
