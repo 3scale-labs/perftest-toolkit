@@ -56,3 +56,7 @@ build-iPhoneSimulator/
 deployment/benchmarks/*.html
 deployment/benchmarks/*.csv
 deployment/inventory/__pycache__/
+
+# Locust
+locust/*.csv
+locust/__pycache__/

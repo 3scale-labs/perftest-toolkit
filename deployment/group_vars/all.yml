@@ -5,6 +5,7 @@ csv_file_name: 3scale.csv
 reports_path: /tmp/3scale-perftest/reports
 csv_dest_file_path: "{{ csv_file_path }}/{{ csv_file_name }}"
 toolkit_csv_file_path: benchmarks
+locust_csv_file_path: locust
 injector_target_group: injector_target
 hyperfoil_agent_port: 22
 hyperfoil_controller_port: 8090
