@@ -62,7 +62,7 @@ Control node:
 * ansible >= 2.9.14
 * python >= 3.0
 * Install ansible requirements
-```
+```bash
 cd deployment
 ansible-galaxy install -r requirements.yaml
 ```
@@ -185,7 +185,9 @@ ansible-playbook -i hosts profiled-injector.yml
 
 ## Run tests
 
-**1.** Configure testing settings in [deployment/run/yml](https://github.com/3scale-labs/perftest-toolkit/blob/c906ca3349a34d9fe6e72d9b28570268387257fd/deployment/run.yml#L9-L11):
+**Note**: If you'd prefer to run the tests using [Locust](https://locust.io/), refer to [this guide](locust/README.md) and skip the below steps.
+
+**1.** Configure testing settings in [deployment/run.yml](https://github.com/3scale-labs/perftest-toolkit/blob/c906ca3349a34d9fe6e72d9b28570268387257fd/deployment/run.yml#L9-L11):
 
 ```
 USERS_PER_SEC: Requests per second

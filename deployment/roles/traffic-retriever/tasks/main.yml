@@ -5,3 +5,8 @@
     src: "{{ csv_file_path }}/{{ csv_file_name }}"
     dest: "{{ playbook_dir }}/{{ toolkit_csv_file_path }}/"
     flat: yes
+- name: Retrieve the CSV inventory file for locust
+  fetch:
+    src: "{{ csv_file_path }}/{{ csv_file_name }}"
+    dest: "{{ playbook_dir | dirname }}/{{ locust_csv_file_path }}/"
+    flat: yes
